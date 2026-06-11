@@ -413,45 +413,20 @@
     }
     .tile-emoji { font-size: 20px; margin-bottom: 8px; }
 
-    /* ─── AT A GLANCE: card grid ─── */
-    .glance-tag { font-size: 11px; font-weight: 800; letter-spacing: 0.4px; text-transform: uppercase; padding: 5px 11px; border-radius: 30px; white-space: nowrap; flex-shrink: 0; }
-    .tag-live { color: #15803d; background: #e7f8ee; }
-    .tag-beta { color: #7b2ff7; background: #f1eafe; }
-    .tag-soon { color: #9a6b00; background: #fdf3da; }
-
-    .glance-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-
-    .glance-card {
-      background: #fff; border: 1px solid var(--border); border-radius: 18px;
-      padding: 22px 22px 18px; text-decoration: none;
-      display: flex; flex-direction: column; position: relative; overflow: hidden;
-      transition: transform 0.22s ease, box-shadow 0.22s ease, background 0.15s;
-    }
-    .glance-card::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-      background: var(--gc-grad, linear-gradient(90deg, var(--purple), var(--pink)));
-    }
-    .glance-card:hover { transform: translateY(-3px); box-shadow: 0 16px 48px -16px rgba(0,0,0,0.13); background: #fdfbff; }
-
-    /* D28 featured — spans 2 rows */
-    .glance-card.gc-featured { grid-row: span 2; }
-    .glance-card.gc-featured .gc-title { font-size: 20px; }
-    .glance-card.gc-featured .gc-desc { font-size: 14.5px; }
-
-    /* Tapjoy — full-width with side visuals */
-    .glance-card.gc-tapjoy {
-      grid-column: 1 / -1; flex-direction: row; align-items: center; gap: 24px;
-      background: linear-gradient(135deg, #fff0fb 0%, #f5f0ff 100%);
-    }
-    .glance-card.gc-tapjoy .gc-body { flex: 1; min-width: 0; }
-    .gc-tapjoy-pills { display: flex; gap: 8px; flex-shrink: 0; }
-    .gtp { font-size: 11px; font-weight: 800; line-height: 1.3; padding: 9px 14px; border-radius: 12px; text-align: center; }
-
-    /* Roadmap — full-width compact row */
-    .glance-card.gc-wide {
-      grid-column: 1 / -1; flex-direction: row; align-items: center; gap: 22px;
-    }
-    .glance-card.gc-wide .gc-body { flex: 1; min-width: 0; }
+    /* ─── AT A GLANCE: visual card grid ─── */
+    .glance-visual-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .gv-card { background: #fff; border: 1px solid var(--border); border-radius: 16px; overflow: hidden; text-decoration: none; display: block; transition: transform 0.22s ease, box-shadow 0.22s ease; }
+    .gv-card:hover { transform: translateY(-3px); box-shadow: 0 12px 36px -12px rgba(0,0,0,0.13); }
+    .gv-thumb { height: 100px; overflow: hidden; }
+    .gv-thumb svg { display: block; width: 100%; height: 100%; }
+    .gv-body { padding: 12px 14px 14px; }
+    .gv-num { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 3px; }
+    .gv-title { font-size: 13px; font-weight: 800; color: var(--text); line-height: 1.3; margin-bottom: 5px; }
+    .gv-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
+    .badge-live { color: #15803d; background: #e7f8ee; }
+    .badge-beta { color: #7b2ff7; background: #f1eafe; }
+    .badge-soon { color: #9a6b00; background: #fdf3da; }
+    .badge-new { color: #be185d; background: #fce7f3; }
 
     /* ─── SECTION 06: DEVELOPER TOOLS ─── */
     #devtools { padding: 80px 60px; background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0fdf4 100%); border-top: 1px solid #bbf7d0; }
@@ -468,22 +443,11 @@
     .devtools-mockup { border-radius: 16px; overflow: hidden; box-shadow: 0 24px 48px -12px rgba(5,150,105,0.18), 0 0 0 1px rgba(5,150,105,0.12); }
     @media (max-width: 860px) { .devtools-grid { grid-template-columns: 1fr; gap: 36px; } #devtools { padding: 60px 28px; } }
 
-    .gc-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
-    .gc-num { font-size: 11px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; color: var(--muted); }
-    .gc-title { font-size: 17px; font-weight: 800; color: var(--text); line-height: 1.25; margin-bottom: 7px; }
-    .gc-desc { font-size: 13.5px; line-height: 1.5; color: var(--muted); flex: 1; }
-    .gc-arr { font-size: 16px; color: var(--purple); margin-top: 14px; align-self: flex-start;
-      opacity: 0; transform: translateX(-4px); transition: opacity 0.15s, transform 0.15s; }
-    .glance-card:hover .gc-arr { opacity: 1; transform: translateX(0); }
-    .glance-card.gc-wide .gc-arr,
-    .glance-card.gc-tapjoy .gc-arr { margin-top: 0; flex-shrink: 0; }
-
     @media (max-width: 680px) {
-      .glance-grid { grid-template-columns: 1fr; }
-      .glance-card.gc-featured { grid-row: auto; }
-      .glance-card.gc-tapjoy { flex-direction: column; align-items: flex-start; }
-      .gc-tapjoy-pills { display: none; }
-      .glance-card.gc-wide { flex-direction: column; align-items: flex-start; }
+      .glance-visual-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 420px) {
+      .glance-visual-grid { grid-template-columns: 1fr; }
     }
 
     /* ─── TAPJOY OFFERWALL SECTION ─── */
@@ -1382,116 +1346,221 @@
     <!-- ═══ AT A GLANCE ═══ -->
     <section id="glance">
       <div class="section-eyebrow">Everything in one glance</div>
-      <div class="glance-grid fade-up">
+      <div class="glance-visual-grid fade-up">
 
-        <!-- 01 — D28 ROAS: featured, spans 2 rows -->
-        <a class="glance-card gc-featured" href="#d28" style="--gc-grad:linear-gradient(90deg,#7b2ff7,#b324d6);">
-          <div class="gc-top">
-            <span class="gc-num">01</span>
-            <span class="glance-tag tag-beta">Live + beta</span>
+        <!-- 01 — D28 ROAS -->
+        <a class="gv-card" href="#d28">
+          <div class="gv-thumb">
+            <svg viewBox="0 0 240 100" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+              <rect width="240" height="100" fill="#f3e8ff"/>
+              <line x1="20" y1="82" x2="220" y2="82" stroke="#ddd6fe" stroke-width="1"/>
+              <line x1="20" y1="62" x2="220" y2="62" stroke="#ddd6fe" stroke-width="1"/>
+              <line x1="20" y1="42" x2="220" y2="42" stroke="#ddd6fe" stroke-width="1"/>
+              <line x1="20" y1="22" x2="220" y2="22" stroke="#ddd6fe" stroke-width="1"/>
+              <polyline points="20,78 60,68 100,56 140,40 180,26 220,14" fill="none" stroke="#7c3aed" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="220" cy="14" r="5" fill="#7c3aed"/>
+              <text x="120" y="95" text-anchor="middle" font-size="9" fill="#7c3aed" font-weight="600" font-family="system-ui,sans-serif">D7 → D28 · +89% scale</text>
+            </svg>
           </div>
-          <div class="gc-title">D28 ROAS, expanded</div>
-          <div class="gc-desc">IAP is live; Ad Revenue &amp; Hybrid now in open beta, worldwide. The optimizer that captures long-tail value a D7 goal never sees.</div>
-          <div class="gc-arr">&rarr;</div>
+          <div class="gv-body">
+            <div class="gv-num">01 — D28 ROAS</div>
+            <div class="gv-title">Scale beyond D7</div>
+            <span class="gv-badge badge-beta">Live + beta</span>
+          </div>
         </a>
 
-        <!-- 02 — Faster ROAS -->
-        <a class="glance-card" href="#roas" style="--gc-grad:linear-gradient(90deg,#0ea5e9,#22c55e);">
-          <div class="gc-top">
-            <span class="gc-num">02</span>
-            <span class="glance-tag tag-live">Improved</span>
+        <!-- 02 — Faster ROAS onboarding -->
+        <a class="gv-card" href="#roas">
+          <div class="gv-thumb">
+            <svg viewBox="0 0 240 100" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+              <rect width="240" height="100" fill="#e0f2fe"/>
+              <rect x="20" y="22" width="60" height="58" rx="5" fill="#bae6fd" stroke="#7dd3fc" stroke-width="1"/>
+              <text x="50" y="55" text-anchor="middle" font-size="13" fill="#0369a1" font-weight="700" font-family="system-ui,sans-serif">CPI</text>
+              <line x1="80" y1="51" x2="106" y2="51" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4,3"/>
+              <polygon points="106,47 114,51 106,55" fill="#94a3b8"/>
+              <text x="95" y="40" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="system-ui,sans-serif">before</text>
+              <rect x="118" y="22" width="102" height="58" rx="5" fill="#0369a1"/>
+              <text x="169" y="47" text-anchor="middle" font-size="11" fill="#fff" font-weight="700" font-family="system-ui,sans-serif">ROAS</text>
+              <text x="169" y="62" text-anchor="middle" font-size="9" fill="#bae6fd" font-family="system-ui,sans-serif">from day one</text>
+            </svg>
           </div>
-          <div class="gc-title">Faster ROAS onboarding</div>
-          <div class="gc-desc">Launch from day one — no detour through CPI.</div>
-          <div class="gc-arr">&rarr;</div>
+          <div class="gv-body">
+            <div class="gv-num">02 — ROAS onboarding</div>
+            <div class="gv-title">Launch from day one</div>
+            <span class="gv-badge badge-live">Improved</span>
+          </div>
         </a>
 
         <!-- 03 — Vector CPE -->
-        <a class="glance-card" href="#cpe" style="--gc-grad:linear-gradient(90deg,#059669,#22c55e);">
-          <div class="gc-top">
-            <span class="gc-num">03</span>
-            <span class="glance-tag tag-live">Live Today</span>
+        <a class="gv-card" href="#cpe">
+          <div class="gv-thumb">
+            <svg viewBox="0 0 240 100" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+              <rect width="240" height="100" fill="#dcfce7"/>
+              <circle cx="120" cy="48" r="36" fill="none" stroke="#86efac" stroke-width="1.5"/>
+              <circle cx="120" cy="48" r="24" fill="none" stroke="#4ade80" stroke-width="1.5"/>
+              <circle cx="120" cy="48" r="13" fill="#22c55e"/>
+              <circle cx="120" cy="48" r="4" fill="#fff"/>
+              <text x="120" y="95" text-anchor="middle" font-size="9" fill="#15803d" font-weight="600" font-family="system-ui,sans-serif">Retention · Payer · Live today</text>
+            </svg>
           </div>
-          <div class="gc-title">Vector CPE — Live</div>
-          <div class="gc-desc">CPE Retention &amp; CPE Payer: two new campaign types to optimize beyond ROAS.</div>
-          <div class="gc-arr">&rarr;</div>
+          <div class="gv-body">
+            <div class="gv-num">03 — Vector CPE</div>
+            <div class="gv-title">Optimize beyond ROAS</div>
+            <span class="gv-badge badge-live">Live today</span>
+          </div>
         </a>
 
         <!-- 04 — Dashboard -->
-        <a class="glance-card" href="#dashboard" style="--gc-grad:linear-gradient(90deg,#312e81,#6366f1);">
-          <div class="gc-top">
-            <span class="gc-num">04</span>
-            <span class="glance-tag tag-live">Live &middot; May 19</span>
+        <a class="gv-card" href="#dashboard">
+          <div class="gv-thumb">
+            <svg viewBox="0 0 240 100" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+              <rect width="240" height="100" fill="#e0e7ff"/>
+              <rect x="20" y="14" width="200" height="72" rx="6" fill="#fff" stroke="#c7d2fe" stroke-width="1"/>
+              <rect x="20" y="14" width="200" height="20" rx="6" fill="#4338ca"/>
+              <rect x="20" y="26" width="200" height="8" fill="#4338ca"/>
+              <circle cx="32" cy="24" r="4" fill="#a5b4fc"/>
+              <circle cx="44" cy="24" r="4" fill="#a5b4fc"/>
+              <circle cx="56" cy="24" r="4" fill="#a5b4fc"/>
+              <rect x="28" y="40" width="56" height="38" rx="4" fill="#e0e7ff" stroke="#c7d2fe" stroke-width="0.5"/>
+              <rect x="92" y="40" width="56" height="38" rx="4" fill="#e0e7ff" stroke="#c7d2fe" stroke-width="0.5"/>
+              <rect x="156" y="40" width="56" height="38" rx="4" fill="#e0e7ff" stroke="#c7d2fe" stroke-width="0.5"/>
+              <text x="56" y="56" text-anchor="middle" font-size="7" fill="#4338ca" font-weight="700" font-family="system-ui,sans-serif">Develop</text>
+              <text x="120" y="56" text-anchor="middle" font-size="7" fill="#4338ca" font-weight="700" font-family="system-ui,sans-serif">Acquire</text>
+              <text x="184" y="56" text-anchor="middle" font-size="7" fill="#4338ca" font-weight="700" font-family="system-ui,sans-serif">Monetize</text>
+              <rect x="34" y="62" width="40" height="4" rx="2" fill="#a5b4fc"/>
+              <rect x="34" y="69" width="26" height="4" rx="2" fill="#c7d2fe"/>
+              <rect x="98" y="62" width="40" height="4" rx="2" fill="#a5b4fc"/>
+              <rect x="98" y="69" width="26" height="4" rx="2" fill="#c7d2fe"/>
+              <rect x="162" y="62" width="40" height="4" rx="2" fill="#a5b4fc"/>
+              <rect x="162" y="69" width="26" height="4" rx="2" fill="#c7d2fe"/>
+            </svg>
           </div>
-          <div class="gc-title">A cleaner dashboard</div>
-          <div class="gc-desc">One Unity — Develop, Acquire, Monetize, in one place.</div>
-          <div class="gc-arr">&rarr;</div>
+          <div class="gv-body">
+            <div class="gv-num">04 — Dashboard</div>
+            <div class="gv-title">One Unity, one view</div>
+            <span class="gv-badge badge-live">Live May 19</span>
+          </div>
         </a>
 
         <!-- 05 — SDK -->
-        <a class="glance-card" href="#sdk" style="--gc-grad:linear-gradient(90deg,#15803d,#22c55e);">
-          <div class="gc-top">
-            <span class="gc-num">05</span>
-            <span class="glance-tag tag-live">Update</span>
+        <a class="gv-card" href="#sdk">
+          <div class="gv-thumb">
+            <svg viewBox="0 0 240 100" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+              <rect width="240" height="100" fill="#f0fdf4"/>
+              <rect x="20" y="12" width="200" height="76" rx="6" fill="#1e293b"/>
+              <text x="34" y="34" font-size="9" fill="#86efac" font-family="monospace">UnityAds.Initialize(</text>
+              <text x="34" y="48" font-size="9" fill="#7dd3fc" font-family="monospace">  gameId, options);</text>
+              <text x="34" y="62" font-size="9" fill="#6ee7b7" font-family="monospace">// SDK 4.18 · async</text>
+              <rect x="34" y="70" width="118" height="12" rx="3" fill="#166534"/>
+              <text x="93" y="80" text-anchor="middle" font-size="8" fill="#86efac" font-family="monospace">59% faster init</text>
+            </svg>
           </div>
-          <div class="gc-title">SDK 4.18+</div>
-          <div class="gc-desc">Up to 59% faster init and cleaner runtime signals.</div>
-          <div class="gc-arr">&rarr;</div>
+          <div class="gv-body">
+            <div class="gv-num">05 — SDK 4.18+</div>
+            <div class="gv-title">59% faster init time</div>
+            <span class="gv-badge badge-live">Update now</span>
+          </div>
         </a>
 
         <!-- 06 — Data Signals -->
-        <a class="glance-card" href="#data" style="--gc-grad:linear-gradient(90deg,#2563eb,#7b2ff7);">
-          <div class="gc-top">
-            <span class="gc-num">06</span>
-            <span class="glance-tag tag-live">New links</span>
+        <a class="gv-card" href="#data">
+          <div class="gv-thumb">
+            <svg viewBox="0 0 240 100" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+              <rect width="240" height="100" fill="#dbeafe"/>
+              <circle cx="70" cy="50" r="26" fill="#1d4ed8"/>
+              <text x="70" y="54" text-anchor="middle" font-size="10" fill="#fff" font-weight="700" font-family="system-ui,sans-serif">Unity</text>
+              <circle cx="172" cy="28" r="20" fill="#2563eb"/>
+              <text x="172" y="32" text-anchor="middle" font-size="9" fill="#fff" font-family="system-ui,sans-serif">GA4</text>
+              <circle cx="172" cy="72" r="20" fill="#3b82f6"/>
+              <text x="172" y="76" text-anchor="middle" font-size="9" fill="#fff" font-family="system-ui,sans-serif">DDF</text>
+              <line x1="96" y1="42" x2="152" y2="30" stroke="#93c5fd" stroke-width="1.5"/>
+              <line x1="96" y1="58" x2="152" y2="70" stroke="#93c5fd" stroke-width="1.5"/>
+              <polygon points="152,26 158,30 152,34" fill="#93c5fd"/>
+              <polygon points="152,66 158,70 152,74" fill="#93c5fd"/>
+            </svg>
           </div>
-          <div class="gc-title">Strengthen your data</div>
-          <div class="gc-desc">Google Analytics linking &amp; the Developer Data Framework — fuller signals for Vector.</div>
-          <div class="gc-arr">&rarr;</div>
+          <div class="gv-body">
+            <div class="gv-num">06 — Data signals</div>
+            <div class="gv-title">GA4 + DDF live</div>
+            <span class="gv-badge badge-live">New links</span>
+          </div>
         </a>
 
-        <!-- 07 — Developer Tools: full-width compact row -->
-        <a class="glance-card gc-wide" href="#devtools" style="--gc-grad:linear-gradient(90deg,#059669,#22c55e);background:linear-gradient(135deg,#f0fdf4,#ecfdf5);">
-          <div class="gc-body">
-            <div class="gc-top">
-              <span class="gc-num" style="color:rgba(5,150,105,0.55);">07</span>
-              <span class="glance-tag" style="background:rgba(5,150,105,0.12);color:#059669;">Open Beta</span>
-            </div>
-            <div class="gc-title" style="color:#052e16;">Unity AI Tutorial Series</div>
-            <div class="gc-desc" style="color:#374151;">AI Assistant &amp; MCP in the Unity Editor — speed up your game development workflow.</div>
+        <!-- 07 — Dev Tools AI -->
+        <a class="gv-card" href="#devtools">
+          <div class="gv-thumb">
+            <svg viewBox="0 0 240 100" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+              <rect width="240" height="100" fill="#ecfdf5"/>
+              <rect x="20" y="14" width="120" height="72" rx="6" fill="#fff" stroke="#bbf7d0" stroke-width="1"/>
+              <rect x="20" y="14" width="120" height="18" rx="6" fill="#059669"/>
+              <rect x="20" y="24" width="120" height="8" fill="#059669"/>
+              <text x="80" y="27" text-anchor="middle" font-size="7" fill="#fff" font-weight="700" font-family="system-ui,sans-serif">Unity Editor</text>
+              <rect x="30" y="40" width="70" height="6" rx="2" fill="#d1fae5"/>
+              <rect x="30" y="51" width="50" height="6" rx="2" fill="#d1fae5"/>
+              <rect x="30" y="62" width="62" height="6" rx="2" fill="#d1fae5"/>
+              <rect x="148" y="22" width="74" height="40" rx="6" fill="#059669"/>
+              <text x="185" y="38" text-anchor="middle" font-size="11" fill="#fff" font-weight="700" font-family="system-ui,sans-serif">AI</text>
+              <text x="185" y="53" text-anchor="middle" font-size="8" fill="#a7f3d0" font-family="system-ui,sans-serif">Assistant</text>
+              <line x1="140" y1="42" x2="148" y2="42" stroke="#6ee7b7" stroke-width="1.5"/>
+            </svg>
           </div>
-          <div class="gc-arr" style="color:rgba(5,150,105,0.5);">&rarr;</div>
+          <div class="gv-body">
+            <div class="gv-num">07 — Unity AI tools</div>
+            <div class="gv-title">AI in the Editor</div>
+            <span class="gv-badge badge-beta">Open beta</span>
+          </div>
         </a>
 
-        <!-- 08 — Tapjoy Offerwall: featured full-width with side pills -->
-        <a class="glance-card gc-tapjoy" href="#tapjoy" style="--gc-grad:linear-gradient(90deg,#f72f9e,#7b2ff7);">
-          <div class="gc-body">
-            <div class="gc-top">
-              <span class="gc-num">08</span>
-              <span class="glance-tag" style="background:rgba(247,47,158,0.12);color:#f72f9e;">New</span>
-            </div>
-            <div class="gc-title">Tapjoy Offerwall</div>
-            <div class="gc-desc">Multi Reward &amp; Daily Rewards live. tROAS 4-tier bidding drives deeper engagement. CPI Billing coming H1 2026.</div>
+        <!-- 08 — Tapjoy -->
+        <a class="gv-card" href="#tapjoy">
+          <div class="gv-thumb">
+            <svg viewBox="0 0 240 100" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+              <rect width="240" height="100" fill="#fce7f3"/>
+              <rect x="40" y="10" width="160" height="80" rx="8" fill="#fff" stroke="#fbcfe8" stroke-width="1"/>
+              <rect x="40" y="10" width="160" height="22" rx="8" fill="#be185d"/>
+              <rect x="40" y="24" width="160" height="8" fill="#be185d"/>
+              <text x="120" y="25" text-anchor="middle" font-size="8" fill="#fff" font-weight="700" font-family="system-ui,sans-serif">Tapjoy Offerwall</text>
+              <rect x="52" y="38" width="136" height="14" rx="3" fill="#fce7f3" stroke="#fbcfe8" stroke-width="0.5"/>
+              <text x="120" y="48" text-anchor="middle" font-size="7" fill="#be185d" font-family="system-ui,sans-serif">Tier 1 · tROAS 2.0×</text>
+              <rect x="52" y="56" width="136" height="14" rx="3" fill="#fce7f3" stroke="#fbcfe8" stroke-width="0.5"/>
+              <text x="120" y="66" text-anchor="middle" font-size="7" fill="#be185d" font-family="system-ui,sans-serif">Tier 2 · tROAS 2.5×</text>
+              <rect x="52" y="74" width="136" height="11" rx="3" fill="#be185d"/>
+              <text x="120" y="83" text-anchor="middle" font-size="7" fill="#fff" font-family="system-ui,sans-serif">Multi Reward · Live</text>
+            </svg>
           </div>
-          <div class="gc-tapjoy-pills">
-            <div class="gtp" style="background:rgba(99,102,241,0.1);color:#4338ca;">Multi<br>Reward<br><span style="font-size:9px;opacity:0.7;font-weight:600;">LIVE</span></div>
-            <div class="gtp" style="background:rgba(147,51,234,0.1);color:#7e22ce;">Daily<br>Rewards<br><span style="font-size:9px;opacity:0.7;font-weight:600;">LIVE</span></div>
-            <div class="gtp" style="background:rgba(15,23,42,0.06);color:#475569;">CPI<br>Billing<br><span style="font-size:9px;opacity:0.7;font-weight:600;">H1 2026</span></div>
+          <div class="gv-body">
+            <div class="gv-num">08 — Tapjoy Offerwall</div>
+            <div class="gv-title">4-tier bidding live</div>
+            <span class="gv-badge badge-new">New</span>
           </div>
-          <div class="gc-arr">&rarr;</div>
         </a>
 
-        <!-- 09 — Roadmap: full-width compact row -->
-        <a class="glance-card gc-wide" href="#roadmap" style="--gc-grad:linear-gradient(90deg,#c026d3,#f72f9e);">
-          <div class="gc-body">
-            <div class="gc-top">
-              <span class="gc-num">09</span>
-              <span class="glance-tag tag-soon">Roadmap</span>
-            </div>
-            <div class="gc-title">Coming next</div>
-            <div class="gc-desc">CPE Custom-Event optimization, and a more agentic Vector.</div>
+        <!-- 09 — Roadmap -->
+        <a class="gv-card" href="#roadmap">
+          <div class="gv-thumb">
+            <svg viewBox="0 0 240 100" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+              <rect width="240" height="100" fill="#f1f5f9"/>
+              <line x1="30" y1="50" x2="210" y2="50" stroke="#cbd5e1" stroke-width="2"/>
+              <circle cx="30" cy="50" r="9" fill="#22c55e"/>
+              <text x="30" y="35" text-anchor="middle" font-size="7" fill="#15803d" font-weight="600" font-family="system-ui,sans-serif">CPE</text>
+              <text x="30" y="44" text-anchor="middle" font-size="6" fill="#86efac" font-family="system-ui,sans-serif">Live</text>
+              <circle cx="90" cy="50" r="9" fill="#6366f1"/>
+              <text x="90" y="35" text-anchor="middle" font-size="7" fill="#4338ca" font-weight="600" font-family="system-ui,sans-serif">Custom</text>
+              <text x="90" y="44" text-anchor="middle" font-size="6" fill="#a5b4fc" font-family="system-ui,sans-serif">CPE</text>
+              <circle cx="150" cy="50" r="9" fill="#94a3b8"/>
+              <text x="150" y="35" text-anchor="middle" font-size="7" fill="#475569" font-weight="600" font-family="system-ui,sans-serif">Agentic</text>
+              <text x="150" y="44" text-anchor="middle" font-size="6" fill="#94a3b8" font-family="system-ui,sans-serif">Vector</text>
+              <circle cx="210" cy="50" r="9" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="1"/>
+              <text x="210" y="35" text-anchor="middle" font-size="7" fill="#94a3b8" font-weight="600" font-family="system-ui,sans-serif">One</text>
+              <text x="210" y="44" text-anchor="middle" font-size="6" fill="#94a3b8" font-family="system-ui,sans-serif">Unity</text>
+              <text x="120" y="78" text-anchor="middle" font-size="8" fill="#64748b" font-family="system-ui,sans-serif">Q2–Q3 2026 roadmap</text>
+            </svg>
           </div>
-          <div class="gc-arr">&rarr;</div>
+          <div class="gv-body">
+            <div class="gv-num">09 — Roadmap</div>
+            <div class="gv-title">What's coming next</div>
+            <span class="gv-badge badge-soon">Preview</span>
+          </div>
         </a>
 
       </div>
