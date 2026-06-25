@@ -107,3 +107,79 @@ function doPost(e) {
 function doGet() {
   return ContentService.createTextOutput('Unity Ads Newsletter analytics endpoint is live.');
 }
+
+/**
+ * Run this ONCE from the editor (Run -> createColumnGuide) to build a readable
+ * "Column guide" tab explaining every column and event type. Safe to re-run.
+ */
+function createColumnGuide() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sh = ss.getSheetByName('Column guide') || ss.insertSheet('Column guide');
+  sh.clear();
+
+  var rows = [
+    ['COLUMN', 'WHAT IT MEANS'],
+    ['Timestamp', 'Date & time the event happened (UTC, ISO 8601).'],
+    ['Event', 'What happened on the page — see "EVENT TYPES" below.'],
+    ['Visitor ID', 'Anonymous ID unique to each browser. Count distinct = unique people; repeats = returning visitors.'],
+    ['Session ID', 'Anonymous ID for a single visit/sitting. Groups one person’s actions together.'],
+    ['Engaged trigger', 'On "engaged" rows: what crossed the interest threshold (time_15s, scroll_50, or cta_click).'],
+    ['Section', 'Which part of the page the row refers to (hero, glance, creatives, roas, cpe, dashboard, data, devtools, tapjoy, roadmap, cta).'],
+    ['Scroll depth %', 'How far down the page the visitor scrolled (25 / 50 / 75 / 100).'],
+    ['Duration (sec)', 'Seconds spent — in a section (section_dwell) or on the whole page (time_on_page).'],
+    ['Subscriber name', 'Name typed into the Subscribe popup (opt-in only).'],
+    ['Studio / company', 'Studio/company typed into the Subscribe popup (opt-in only).'],
+    ['Email / link', 'Subscriber’s email address (on "subscribe" rows).'],
+    ['Campaign source', 'utm_source from the landing URL — where the visit came from (e.g. linkedin, slack).'],
+    ['Campaign medium', 'utm_medium — type of channel (e.g. social, email, cpc).'],
+    ['Campaign name', 'utm_campaign — the campaign label (e.g. june_launch).'],
+    ['Campaign term', 'utm_term — paid search keyword, if any.'],
+    ['Campaign content', 'utm_content — which specific link/creative was clicked.'],
+    ['Google Ads click ID', 'gclid — added automatically to clicks from Google Ads.'],
+    ['Meta click ID', 'fbclid — added automatically to clicks from Facebook/Instagram.'],
+    ['Country', 'Approximate country from the visitor’s IP.'],
+    ['Region / state', 'Approximate region/state from IP.'],
+    ['City', 'Approximate city from IP.'],
+    ['Country code', 'Two-letter country code (e.g. IL, US).'],
+    ['ISP / network', 'Internet provider / network name from IP.'],
+    ['IP address', 'Visitor’s IP address (used for location; this is personal data).'],
+    ['Device type', 'desktop or mobile.'],
+    ['Operating system', 'Windows, macOS, iOS, Android, or Linux.'],
+    ['Browser', 'Chrome, Safari, Firefox, Edge, etc.'],
+    ['Language', 'Browser language (e.g. en-US).'],
+    ['Timezone', 'Visitor’s timezone (e.g. America/Los_Angeles).'],
+    ['Screen width', 'Browser viewport width in pixels.'],
+    ['Screen height', 'Browser viewport height in pixels.'],
+    ['Page path', 'Page URL path + hash.'],
+    ['Referrer (came from)', 'The URL the visitor arrived from, if any.'],
+    ['', ''],
+    ['EVENT TYPES', 'WHAT THE ROW RECORDS'],
+    ['page_view', 'A visitor opened the page (one per load).'],
+    ['visitor_info', 'Full location + device snapshot, sent once location resolves.'],
+    ['section_view', 'First time the visitor reached a given section (where they went).'],
+    ['section_dwell', 'Seconds the visitor spent in a section (where they paused).'],
+    ['scroll_depth', 'Reached a scroll milestone — 25 / 50 / 75 / 100%.'],
+    ['time_on_page', 'Total seconds on the page (sent when they leave).'],
+    ['engaged', 'Visitor showed real interest — 15s on page, 50% scroll, or a click. Once per session.'],
+    ['cta_talk_to_team', 'Clicked "Talk to your Unity team".'],
+    ['subscribe_open', 'Opened the Subscribe popup.'],
+    ['subscribe', 'Submitted the Subscribe form (carries email / name / studio).'],
+    ['nav_click', 'Used the side navigation.'],
+    ['glance_click', 'Clicked an "At a glance" index item.'],
+    ['outbound_click', 'Clicked an external reference link.']
+  ];
+
+  sh.getRange(1, 1, rows.length, 2).setValues(rows);
+  sh.setColumnWidth(1, 200);
+  sh.setColumnWidth(2, 640);
+  sh.setFrozenRows(1);
+  sh.getRange(1, 1, 1, 2).setFontWeight('bold').setBackground('#7b2ff7').setFontColor('#ffffff');
+  // bold the "EVENT TYPES" divider row
+  for (var i = 0; i < rows.length; i++) {
+    if (rows[i][0] === 'EVENT TYPES') {
+      sh.getRange(i + 1, 1, 1, 2).setFontWeight('bold').setBackground('#f72f9e').setFontColor('#ffffff');
+    }
+  }
+  sh.getRange(1, 1, rows.length, 2).setVerticalAlignment('middle').setWrap(true);
+  return 'Column guide created';
+}
