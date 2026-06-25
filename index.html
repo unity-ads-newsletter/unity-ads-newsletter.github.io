@@ -2714,7 +2714,7 @@
       <div class="cta-box">
         <div class="cta-title fade-up">Not sure where to start?</div>
         <div class="cta-body fade-up d2">There&rsquo;s no single right answer &mdash; the best next step depends on your monetization model and where your biggest gaps are today. Your Unity team is happy to look at your setup with you and figure out what&rsquo;s worth doing first.</div>
-        <a href="mailto:alon.halva@unity3d.com?subject=Unity%20Ads%20%E2%80%94%20let%27s%20talk%20about%20my%20setup&amp;body=Hi%20Alon%2C%0A%0AI%27d%20love%20to%20go%20over%20what%27s%20worth%20doing%20first%20for%20my%20game.%0A%0A" class="cta-btn fade-up d3">Talk to your Unity team</a>
+        <a href="https://unity.com/contact-us" target="_blank" rel="noopener" class="cta-btn fade-up d3">Talk to your Unity team</a>
       </div>
     </section>
 
@@ -2723,11 +2723,50 @@
       <p class="footer-disclaimer">Performance figures above come from internal Unity analyses and beta cohorts. They&rsquo;re real results we&rsquo;ve observed &mdash; not guaranteed outcomes. Your mileage depends on your game, traffic, and setup.</p>
       <p class="footer-sign">Thanks for reading. More soon. &mdash; The Unity Ads team</p>
       <p class="footer-links">
-        <a href="https://create.unity.com/Unity_MyPage_W_AccountID" target="_blank" rel="noopener">Manage preferences</a> &nbsp;&middot;&nbsp; <a href="unsubscribe.html">Unsubscribe</a> &nbsp;&middot;&nbsp; Unity Technologies
+        <a id="subscribe-link" href="#subscribe" rel="noopener">Subscribe</a> &nbsp;&middot;&nbsp; Unity Technologies
       </p>
     </footer>
 
   </main>
+</div>
+
+<!-- ═══ SUBSCRIBE POPUP ═══ -->
+<style>
+  .nlsub-overlay{position:fixed;inset:0;background:rgba(13,10,20,.6);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:9999;padding:20px;}
+  .nlsub-overlay.open{display:flex;}
+  .nlsub-modal{position:relative;background:#fff;border-radius:20px;max-width:420px;width:100%;padding:38px 32px 32px;box-shadow:0 24px 64px rgba(13,10,20,.32);font-family:'Inter',sans-serif;}
+  .nlsub-close{position:absolute;top:12px;right:16px;background:none;border:none;font-size:28px;line-height:1;color:#9b9bad;cursor:pointer;}
+  .nlsub-close:hover{color:#1a1a2e;}
+  .nlsub-title{font-size:26px;font-weight:800;color:#1a1a2e;margin:0 0 6px;}
+  .nlsub-sub{font-size:15px;line-height:1.4;color:#6b6b80;margin:0 0 20px;}
+  .nlsub-input{width:100%;padding:13px 16px;font-size:15px;border:1.5px solid #e2e0ee;border-radius:12px;font-family:inherit;color:#1a1a2e;outline:none;}
+  .nlsub-input:focus{border-color:#7b2ff7;}
+  .nlsub-btn{width:100%;margin-top:12px;padding:14px;font-size:15px;font-weight:700;color:#fff;background:linear-gradient(135deg,#7b2ff7,#f72f9e);border:none;border-radius:999px;cursor:pointer;}
+  .nlsub-btn:hover{opacity:.92;}
+  .nlsub-err{color:#f72f9e;font-size:13px;margin:10px 0 0;min-height:16px;}
+  .nlsub-consent{font-size:11px;line-height:1.4;color:#9b9bad;margin:14px 0 0;}
+  .nlsub-done{text-align:center;padding:8px 0;}
+  .nlsub-check{width:56px;height:56px;margin:0 auto 14px;border-radius:50%;background:linear-gradient(135deg,#7b2ff7,#f72f9e);color:#fff;font-size:30px;display:flex;align-items:center;justify-content:center;}
+  .nlsub-done p{font-size:17px;font-weight:600;color:#1a1a2e;margin:0;}
+</style>
+<div id="nlsub-overlay" class="nlsub-overlay" aria-hidden="true">
+  <div class="nlsub-modal" role="dialog" aria-modal="true" aria-labelledby="nlsub-title">
+    <button type="button" class="nlsub-close" id="nlsub-close" aria-label="Close">&times;</button>
+    <div id="nlsub-form">
+      <h3 id="nlsub-title" class="nlsub-title">Subscribe</h3>
+      <p class="nlsub-sub">Get the next Unity Ads update in your inbox &mdash; no spam, just what&rsquo;s new.</p>
+      <input type="text" id="nlsub-name" class="nlsub-input" placeholder="Your name (optional)" autocomplete="name">
+      <input type="text" id="nlsub-studio" class="nlsub-input" placeholder="Studio / company (optional)" autocomplete="organization" style="margin-top:10px;">
+      <input type="email" id="nlsub-email" class="nlsub-input" placeholder="you@studio.com" autocomplete="email" required style="margin-top:10px;">
+      <button type="button" id="nlsub-submit" class="nlsub-btn">Subscribe</button>
+      <p class="nlsub-err" id="nlsub-err"></p>
+      <p class="nlsub-consent">By subscribing you agree we may store your details to send you Unity Ads updates. Unsubscribe anytime.</p>
+    </div>
+    <div id="nlsub-done" class="nlsub-done" style="display:none;">
+      <div class="nlsub-check">&#10003;</div>
+      <p>Thanks &mdash; you&rsquo;re on the list.</p>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -2980,8 +3019,8 @@
     if (typeof window.gtag === 'function') { window.gtag('event', name, params || {}); }
   }
 
-  // Primary CTA: "Talk to your Unity team" (mailto) — the conversation goal
-  document.querySelectorAll('a[href^="mailto:"]').forEach(function(a){
+  // Primary CTA: "Talk to your Unity team" (→ unity.com/contact-us) — the conversation goal
+  document.querySelectorAll('a.cta-btn').forEach(function(a){
     a.addEventListener('click', function(){ track('cta_talk_to_team'); });
   });
 
@@ -2995,11 +3034,33 @@
     a.addEventListener('click', function(){ track('nav_click', { section: a.getAttribute('data-section') }); });
   });
 
-  // Manage preferences / Unsubscribe
-  var pref = document.querySelector('a[href*="create.unity.com"]');
-  if (pref) pref.addEventListener('click', function(){ track('manage_preferences_click'); });
-  var unsub = document.querySelector('a[href="unsubscribe.html"]');
-  if (unsub) unsub.addEventListener('click', function(){ track('unsubscribe_click'); });
+  // Subscribe (footer): open built-in popup
+  var sub = document.getElementById('subscribe-link');
+  var overlay = document.getElementById('nlsub-overlay');
+  function openSub(){ if (overlay) { overlay.classList.add('open'); overlay.setAttribute('aria-hidden','false'); var i = document.getElementById('nlsub-email'); if (i) i.focus(); } }
+  function closeSub(){ if (overlay) { overlay.classList.remove('open'); overlay.setAttribute('aria-hidden','true'); } }
+  if (sub) {
+    sub.addEventListener('click', function(e){ e.preventDefault(); track('subscribe_open'); openSub(); });
+  }
+  if (overlay) {
+    var closeBtn = document.getElementById('nlsub-close');
+    if (closeBtn) closeBtn.addEventListener('click', closeSub);
+    overlay.addEventListener('click', function(e){ if (e.target === overlay) closeSub(); });
+    document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeSub(); });
+    var submit = document.getElementById('nlsub-submit');
+    if (submit) submit.addEventListener('click', function(){
+      var email = (document.getElementById('nlsub-email').value || '').trim();
+      var name = (document.getElementById('nlsub-name').value || '').trim();
+      var studio = (document.getElementById('nlsub-studio').value || '').trim();
+      var err = document.getElementById('nlsub-err');
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { err.textContent = 'Please enter a valid email.'; return; }
+      err.textContent = '';
+      track('subscribe', { url: email, name: name, studio: studio });
+      document.getElementById('nlsub-form').style.display = 'none';
+      document.getElementById('nlsub-done').style.display = 'block';
+      setTimeout(closeSub, 2200);
+    });
+  }
 
   // Outbound case-study / reference links
   document.querySelectorAll('a[href^="http"]').forEach(function(a){
@@ -3621,8 +3682,8 @@
     if (typeof window.gtag === 'function') { window.gtag('event', name, params || {}); }
   }
 
-  // Primary CTA: "Talk to your Unity team" (mailto) — the conversation goal
-  document.querySelectorAll('a[href^="mailto:"]').forEach(function(a){
+  // Primary CTA: "Talk to your Unity team" (→ unity.com/contact-us) — the conversation goal
+  document.querySelectorAll('a.cta-btn').forEach(function(a){
     a.addEventListener('click', function(){ track('cta_talk_to_team'); });
   });
 
@@ -3636,11 +3697,33 @@
     a.addEventListener('click', function(){ track('nav_click', { section: a.getAttribute('data-section') }); });
   });
 
-  // Manage preferences / Unsubscribe
-  var pref = document.querySelector('a[href*="create.unity.com"]');
-  if (pref) pref.addEventListener('click', function(){ track('manage_preferences_click'); });
-  var unsub = document.querySelector('a[href="unsubscribe.html"]');
-  if (unsub) unsub.addEventListener('click', function(){ track('unsubscribe_click'); });
+  // Subscribe (footer): open built-in popup
+  var sub = document.getElementById('subscribe-link');
+  var overlay = document.getElementById('nlsub-overlay');
+  function openSub(){ if (overlay) { overlay.classList.add('open'); overlay.setAttribute('aria-hidden','false'); var i = document.getElementById('nlsub-email'); if (i) i.focus(); } }
+  function closeSub(){ if (overlay) { overlay.classList.remove('open'); overlay.setAttribute('aria-hidden','true'); } }
+  if (sub) {
+    sub.addEventListener('click', function(e){ e.preventDefault(); track('subscribe_open'); openSub(); });
+  }
+  if (overlay) {
+    var closeBtn = document.getElementById('nlsub-close');
+    if (closeBtn) closeBtn.addEventListener('click', closeSub);
+    overlay.addEventListener('click', function(e){ if (e.target === overlay) closeSub(); });
+    document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeSub(); });
+    var submit = document.getElementById('nlsub-submit');
+    if (submit) submit.addEventListener('click', function(){
+      var email = (document.getElementById('nlsub-email').value || '').trim();
+      var name = (document.getElementById('nlsub-name').value || '').trim();
+      var studio = (document.getElementById('nlsub-studio').value || '').trim();
+      var err = document.getElementById('nlsub-err');
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { err.textContent = 'Please enter a valid email.'; return; }
+      err.textContent = '';
+      track('subscribe', { url: email, name: name, studio: studio });
+      document.getElementById('nlsub-form').style.display = 'none';
+      document.getElementById('nlsub-done').style.display = 'block';
+      setTimeout(closeSub, 2200);
+    });
+  }
 
   // Outbound case-study / reference links
   document.querySelectorAll('a[href^="http"]').forEach(function(a){
