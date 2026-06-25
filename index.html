@@ -414,6 +414,20 @@
     .tile-emoji { font-size: 20px; margin-bottom: 8px; }
 
     /* ─── AT A GLANCE: card grid ─── */
+    /* ─── AT-A-GLANCE V2 — two-column list ─── */
+    .gv2-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0 1px; background: rgba(0,0,0,0.06); border-radius: 16px; overflow: hidden; border: 1px solid rgba(0,0,0,0.07); }
+    .gv2-col { background: #fff; display: flex; flex-direction: column; }
+    .gv2-row { display: flex; align-items: flex-start; gap: 12px; padding: 14px 18px; border-bottom: 1px solid rgba(0,0,0,0.05); text-decoration: none; color: inherit; transition: background 0.15s; }
+    .gv2-row:hover { background: rgba(123,47,247,0.03); }
+    .gv2-row:last-child { border-bottom: none; }
+    .gv2-num { font-size: 10.5px; font-weight: 800; color: rgba(0,0,0,0.2); min-width: 22px; padding-top: 3px; letter-spacing: 0.5px; }
+    .gv2-body { flex: 1; min-width: 0; }
+    .gv2-head { display: flex; align-items: center; gap: 7px; margin-bottom: 3px; flex-wrap: wrap; }
+    .gv2-title { font-size: 13px; font-weight: 700; color: var(--text); line-height: 1.3; }
+    .gv2-desc { font-size: 12px; color: var(--muted); line-height: 1.45; }
+    .gv2-arr { font-size: 12px; color: rgba(0,0,0,0.18); padding-top: 3px; transition: transform 0.15s, color 0.15s; flex-shrink: 0; }
+    .gv2-row:hover .gv2-arr { color: var(--purple); transform: translateX(3px); }
+    @media (max-width: 600px) { .gv2-cols { grid-template-columns: 1fr; } }
     .glance-tag { font-size: 11px; font-weight: 800; letter-spacing: 0.4px; text-transform: uppercase; padding: 5px 11px; border-radius: 30px; white-space: nowrap; flex-shrink: 0; }
     .tag-live { color: #15803d; background: #e7f8ee; }
     .tag-beta { color: #7b2ff7; background: #f1eafe; }
@@ -1408,118 +1422,87 @@
     <!-- ═══ AT A GLANCE ═══ -->
     <section id="glance">
       <div class="section-eyebrow">Everything in one glance</div>
-      <div class="glance-grid fade-up">
+      <div class="gv2-cols fade-up">
 
-        <!-- 01 — D28 ROAS: featured, spans 2 rows -->
-        <a class="glance-card gc-featured" href="#d28" style="--gc-grad:linear-gradient(90deg,#7b2ff7,#b324d6);">
-          <div class="gc-top">
-            <span class="gc-num">01</span>
-            <span class="glance-tag tag-beta">Live + beta</span>
-          </div>
-          <div class="gc-title">D28 ROAS, expanded</div>
-          <div class="gc-desc">IAP is live; Ad Revenue &amp; Hybrid now in open beta, worldwide. The optimizer that captures long-tail value a D7 goal never sees.</div>
-          <div class="gc-arr">&rarr;</div>
-        </a>
-
-        <!-- 02 — Faster ROAS -->
-        <a class="glance-card" href="#roas" style="--gc-grad:linear-gradient(90deg,#0ea5e9,#22c55e);">
-          <div class="gc-top">
-            <span class="gc-num">02</span>
-            <span class="glance-tag tag-live">Improved</span>
-          </div>
-          <div class="gc-title">Faster ROAS onboarding</div>
-          <div class="gc-desc">Launch from day one — no detour through CPI.</div>
-          <div class="gc-arr">&rarr;</div>
-        </a>
-
-        <!-- 03 — Vector CPE -->
-        <a class="glance-card" href="#cpe" style="--gc-grad:linear-gradient(90deg,#059669,#22c55e);">
-          <div class="gc-top">
-            <span class="gc-num">03</span>
-            <span class="glance-tag tag-live">Live Today</span>
-          </div>
-          <div class="gc-title">Vector CPE — Live</div>
-          <div class="gc-desc">CPE Retention &amp; CPE Payer: two new campaign types to optimize beyond ROAS.</div>
-          <div class="gc-arr">&rarr;</div>
-        </a>
-
-        <!-- 04 — Dashboard -->
-        <a class="glance-card" href="#dashboard" style="--gc-grad:linear-gradient(90deg,#312e81,#6366f1);">
-          <div class="gc-top">
-            <span class="gc-num">04</span>
-            <span class="glance-tag tag-live">Live &middot; May 19</span>
-          </div>
-          <div class="gc-title">A cleaner dashboard</div>
-          <div class="gc-desc">One Unity — Develop, Acquire, Monetize, in one place.</div>
-          <div class="gc-arr">&rarr;</div>
-        </a>
-
-        <!-- 05 — SDK -->
-        <a class="glance-card" href="#sdk" style="--gc-grad:linear-gradient(90deg,#15803d,#22c55e);">
-          <div class="gc-top">
-            <span class="gc-num">05</span>
-            <span class="glance-tag tag-live">Update</span>
-          </div>
-          <div class="gc-title">SDK 4.18+</div>
-          <div class="gc-desc">Up to 59% faster init and cleaner runtime signals.</div>
-          <div class="gc-arr">&rarr;</div>
-        </a>
-
-        <!-- 06 — Data Signals -->
-        <a class="glance-card" href="#data" style="--gc-grad:linear-gradient(90deg,#2563eb,#7b2ff7);">
-          <div class="gc-top">
-            <span class="gc-num">06</span>
-            <span class="glance-tag tag-live">New links</span>
-          </div>
-          <div class="gc-title">Strengthen your data</div>
-          <div class="gc-desc">Google Analytics linking &amp; the Developer Data Framework — fuller signals for Vector.</div>
-          <div class="gc-arr">&rarr;</div>
-        </a>
-
-        <!-- 07 — Developer Tools: full-width compact row -->
-        <a class="glance-card gc-wide" href="#devtools" style="--gc-grad:linear-gradient(90deg,#059669,#22c55e);background:linear-gradient(135deg,#f0fdf4,#ecfdf5);">
-          <div class="gc-body">
-            <div class="gc-top">
-              <span class="gc-num" style="color:rgba(5,150,105,0.55);">07</span>
-              <span class="glance-tag" style="background:rgba(5,150,105,0.12);color:#059669;">Open Beta</span>
+        <div class="gv2-col">
+          <a class="gv2-row" href="#d28">
+            <span class="gv2-num">01</span>
+            <div class="gv2-body">
+              <div class="gv2-head"><span class="gv2-title">D28 ROAS, expanded</span><span class="glance-tag tag-beta">Live + beta</span></div>
+              <div class="gv2-desc">IAP is live; Ad Revenue &amp; Hybrid now in open beta, worldwide.</div>
             </div>
-            <div class="gc-title" style="color:#052e16;">Unity AI Tutorial Series</div>
-            <div class="gc-desc" style="color:#374151;">AI Assistant &amp; MCP in the Unity Editor — speed up your game development workflow.</div>
-          </div>
-          <div class="gc-arr" style="color:rgba(5,150,105,0.5);">&rarr;</div>
-        </a>
-
-        <!-- 08 — Tapjoy Offerwall: featured full-width with side pills -->
-        <a class="glance-card gc-tapjoy" href="#tapjoy" style="--gc-grad:linear-gradient(90deg,#f72f9e,#7b2ff7);">
-          <div class="gc-body">
-            <div class="gc-top">
-              <span class="gc-num">08</span>
-              <span class="glance-tag" style="background:rgba(247,47,158,0.12);color:#f72f9e;">New</span>
+            <span class="gv2-arr">&rarr;</span>
+          </a>
+          <a class="gv2-row" href="#roas">
+            <span class="gv2-num">02</span>
+            <div class="gv2-body">
+              <div class="gv2-head"><span class="gv2-title">Faster ROAS onboarding</span><span class="glance-tag tag-live">Improved</span></div>
+              <div class="gv2-desc">Launch from day one &mdash; no detour through CPI.</div>
             </div>
-            <div class="gc-title">Tapjoy Offerwall</div>
-            <div class="gc-desc">Multi Reward &amp; Daily Rewards live. tROAS 4-tier bidding drives deeper engagement. CPI Billing coming H1 2026.</div>
-          </div>
-          <div class="gc-tapjoy-pills">
-            <div class="gtp" style="background:rgba(99,102,241,0.1);color:#4338ca;">Multi<br>Reward<br><span style="font-size:9px;opacity:0.7;font-weight:600;">LIVE</span></div>
-            <div class="gtp" style="background:rgba(147,51,234,0.1);color:#7e22ce;">Daily<br>Rewards<br><span style="font-size:9px;opacity:0.7;font-weight:600;">LIVE</span></div>
-            <div class="gtp" style="background:rgba(15,23,42,0.06);color:#475569;">CPI<br>Billing<br><span style="font-size:9px;opacity:0.7;font-weight:600;">H1 2026</span></div>
-          </div>
-          <div class="gc-arr">&rarr;</div>
-        </a>
-
-        <!-- 09 — Roadmap: full-width compact row -->
-        <a class="glance-card gc-wide" href="#roadmap" style="--gc-grad:linear-gradient(90deg,#c026d3,#f72f9e);">
-          <div class="gc-body">
-            <div class="gc-top">
-              <span class="gc-num">09</span>
-              <span class="glance-tag tag-soon">Roadmap</span>
+            <span class="gv2-arr">&rarr;</span>
+          </a>
+          <a class="gv2-row" href="#cpe">
+            <span class="gv2-num">03</span>
+            <div class="gv2-body">
+              <div class="gv2-head"><span class="gv2-title">Vector CPE &mdash; Live</span><span class="glance-tag tag-live">Live Today</span></div>
+              <div class="gv2-desc">CPE Retention &amp; CPE Payer: optimize beyond install ROAS.</div>
             </div>
-            <div class="gc-title">Coming next</div>
-            <div class="gc-desc">CPE Custom-Event optimization, and a more agentic Vector.</div>
-          </div>
-          <div class="gc-arr">&rarr;</div>
-        </a>
+            <span class="gv2-arr">&rarr;</span>
+          </a>
+          <a class="gv2-row" href="#dashboard">
+            <span class="gv2-num">04</span>
+            <div class="gv2-body">
+              <div class="gv2-head"><span class="gv2-title">A cleaner dashboard</span><span class="glance-tag tag-live">Live &middot; May 19</span></div>
+              <div class="gv2-desc">One Unity &mdash; Develop, Acquire, Monetize in one place.</div>
+            </div>
+            <span class="gv2-arr">&rarr;</span>
+          </a>
+          <a class="gv2-row" href="#sdk">
+            <span class="gv2-num">05</span>
+            <div class="gv2-body">
+              <div class="gv2-head"><span class="gv2-title">SDK 4.18+</span><span class="glance-tag tag-live">Update</span></div>
+              <div class="gv2-desc">Up to 59% faster init and cleaner runtime signals.</div>
+            </div>
+            <span class="gv2-arr">&rarr;</span>
+          </a>
+        </div>
 
+        <div class="gv2-col">
+          <a class="gv2-row" href="#data">
+            <span class="gv2-num">06</span>
+            <div class="gv2-body">
+              <div class="gv2-head"><span class="gv2-title">Strengthen your data</span><span class="glance-tag tag-live">New links</span></div>
+              <div class="gv2-desc">Google Analytics linking &amp; Developer Data Framework.</div>
+            </div>
+            <span class="gv2-arr">&rarr;</span>
+          </a>
+          <a class="gv2-row" href="#devtools">
+            <span class="gv2-num">07</span>
+            <div class="gv2-body">
+              <div class="gv2-head"><span class="gv2-title">Unity AI Tutorial Series</span><span class="glance-tag" style="background:rgba(5,150,105,0.12);color:#059669;">Open Beta</span></div>
+              <div class="gv2-desc">AI Assistant &amp; MCP in the Unity Editor &mdash; speed up your workflow.</div>
+            </div>
+            <span class="gv2-arr">&rarr;</span>
+          </a>
+          <a class="gv2-row" href="#tapjoy">
+            <span class="gv2-num">08</span>
+            <div class="gv2-body">
+              <div class="gv2-head"><span class="gv2-title">Tapjoy Offerwall</span><span class="glance-tag" style="background:rgba(247,47,158,0.12);color:#f72f9e;">New</span></div>
+              <div class="gv2-desc">Multi Reward &amp; Daily Rewards live. tROAS 4-tier bidding.</div>
+            </div>
+            <span class="gv2-arr">&rarr;</span>
+          </a>
+          <a class="gv2-row" href="#roadmap">
+            <span class="gv2-num">09</span>
+            <div class="gv2-body">
+              <div class="gv2-head"><span class="gv2-title">Coming next</span><span class="glance-tag tag-soon">Roadmap</span></div>
+              <div class="gv2-desc">CPE Custom-Event optimization, and a more agentic Vector.</div>
+            </div>
+            <span class="gv2-arr">&rarr;</span>
+          </a>
+        </div>
+
+      </div>
       </div>
     </section>
 
@@ -1646,8 +1629,8 @@
       <!-- ─── INTERACTIVE PLAYABLE ─── -->
       <div class="playable-demo fade-up">
         <div class="playable-kicker">&#10022; Live &mdash; try it now</div>
-        <p style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:6px;line-height:1.3;">A real playable ad &mdash; right in your newsletter</p>
-        <p style="font-size:14px;color:var(--muted);margin-bottom:28px;max-width:480px;margin-left:auto;margin-right:auto;">Move your cursor over the screen to play. This is exactly how a playable ad works &mdash; instant engagement, no download needed.</p>
+        <p style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:6px;line-height:1.3;">Top-performing creative right now is Playable &amp; Video</p>
+        <p style="font-size:14px;color:var(--muted);margin-bottom:28px;max-width:480px;margin-left:auto;margin-right:auto;">Playables drive <strong>20&times; more installs</strong> than banners. Video drives <strong>14&times;</strong>. Try the real thing below.</p>
         <div class="playable-phone-frame" id="playable-frame">
           <canvas id="gem-canvas" width="210" height="410"></canvas>
         </div>
