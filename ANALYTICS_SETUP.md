@@ -15,6 +15,8 @@ Until then nothing is sent — safe to ship.
 | How long did they spend       | `time_on_page` — total seconds, sent when they leave          |
 | CTA / Subscribe interest      | `cta_talk_to_team`, `subscribe_open`, `subscribe`, `nav_click`, `glance_click` |
 | Who/where the viewer is       | `visitor_info` + every row carries: `country`, `region`, `city`, `isp`, `ip`, `device`, `os`, `browser`, `lang`, `tz` |
+| Which channel they came from  | `utm_source`, `utm_medium`, `utm_campaign`, `utm_term`, `utm_content`, `gclid`, `fbclid` — read from the landing URL, kept for the whole session, attached to every row |
+| Real interest                 | `engaged` — fires once per session at 15s on page OR 50% scroll OR a click (`reason` column says which) |
 | Subscriber identity (opt-in)  | `subscribe` row: email in `url`, plus `name` and `studio` columns |
 
 > Location is approximate (IP-based, via ipwho.is — no key). Email/name/studio are

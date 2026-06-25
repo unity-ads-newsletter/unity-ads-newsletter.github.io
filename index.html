@@ -3098,13 +3098,34 @@
   var ua = navigator.userAgent || '';
   function parseBrowser(u){ if(/edg/i.test(u))return'Edge'; if(/opr|opera/i.test(u))return'Opera'; if(/chrome|crios/i.test(u))return'Chrome'; if(/firefox|fxios/i.test(u))return'Firefox'; if(/safari/i.test(u))return'Safari'; return'Other'; }
   function parseOS(u){ if(/windows/i.test(u))return'Windows'; if(/iphone|ipad|ipod/i.test(u))return'iOS'; if(/android/i.test(u))return'Android'; if(/mac os/i.test(u))return'macOS'; if(/linux/i.test(u))return'Linux'; return'Other'; }
-  var ctx = {
+  // Campaign attribution — read utm_*/gclid/fbclid from the URL on the first
+  // landing and remember them for the whole session (so they stay attached even
+  // after reloads or hash navigation).
+  var utm = (function(){
+    var keys = ['utm_source','utm_medium','utm_campaign','utm_term','utm_content','gclid','fbclid'];
+    var out = {};
+    try {
+      var stored = JSON.parse(sessionStorage.getItem('nl_utm') || '{}');
+      var qs = new URLSearchParams(location.search);
+      var sawNew = false;
+      keys.forEach(function(k){
+        var v = qs.get(k);
+        if (v) { out[k] = v; sawNew = true; }
+        else if (stored[k]) { out[k] = stored[k]; }
+      });
+      if (sawNew) { sessionStorage.setItem('nl_utm', JSON.stringify(out)); }
+      else { out = stored; }
+    } catch(e){}
+    return out;
+  })();
+
+  var ctx = Object.assign({
     lang: navigator.language || '',
     tz: (function(){ try { return Intl.DateTimeFormat().resolvedOptions().timeZone; } catch(e){ return ''; } })(),
     os: parseOS(ua),
     browser: parseBrowser(ua),
     device: /mobile|android|iphone|ipad|ipod/i.test(ua) ? 'mobile' : 'desktop'
-  };
+  }, utm);
   var geo = {}; // populated asynchronously from IP lookup (country / region / city / isp)
 
   function track(name, params){
@@ -3130,6 +3151,18 @@
   // Count the visit as soon as the page loads
   track('page_view');
 
+  // Engagement: fire once per session when the visitor crosses a real-interest
+  // threshold — 15s on page, OR 50% scroll, OR a click (whichever comes first).
+  var engagedFired = false;
+  function markEngaged(reason){
+    if (engagedFired) return;
+    try { if (sessionStorage.getItem('nl_engaged')) { engagedFired = true; return; } } catch(e){}
+    engagedFired = true;
+    try { sessionStorage.setItem('nl_engaged', '1'); } catch(e){}
+    track('engaged', { reason: reason });
+  }
+  setTimeout(function(){ markEngaged('time_15s'); }, 15000);
+
   // Approximate location from IP (best-effort, no key). Once resolved, it's
   // attached to every later event, plus one visitor_info row with the full picture.
   try {
@@ -3150,7 +3183,7 @@
 
   // Primary CTA: "Talk to your Unity team" (→ unity.com/contact-us) — the conversation goal
   document.querySelectorAll('a.cta-btn').forEach(function(a){
-    a.addEventListener('click', function(){ track('cta_talk_to_team'); });
+    a.addEventListener('click', function(){ markEngaged('cta_click'); track('cta_talk_to_team'); });
   });
 
   // "At a glance" index clicks — which topics pull interest
@@ -3212,7 +3245,7 @@
     var max = d.scrollHeight - d.clientHeight;
     if (max <= 0) return;
     var pct = (d.scrollTop / max) * 100;
-    marks.forEach(function(m){ if (!hit[m] && pct >= m) { hit[m] = 1; track('scroll_depth', { percent: m }); } });
+    marks.forEach(function(m){ if (!hit[m] && pct >= m) { hit[m] = 1; track('scroll_depth', { percent: m }); if (m >= 50) markEngaged('scroll_50'); } });
   }
   document.addEventListener('scroll', onScroll, { passive: true });
 
