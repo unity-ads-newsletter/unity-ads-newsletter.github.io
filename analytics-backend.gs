@@ -183,3 +183,83 @@ function createColumnGuide() {
   sh.getRange(1, 1, rows.length, 2).setVerticalAlignment('middle').setWrap(true);
   return 'Column guide created';
 }
+
+/**
+ * Builds/refreshes a "Sessions" tab: ONE clean row per visit, rolled up from
+ * the raw "events" log. Run from the editor (Run -> rebuildSessions) or via the
+ * "Analytics" menu in the Sheet. Add a time-driven trigger for auto-refresh.
+ */
+function rebuildSessions() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var ev = ss.getSheetByName('events');
+  if (!ev || ev.getLastRow() < 2) { return 'No events yet'; }
+  var data = ev.getDataRange().getValues();
+  var H = data[0];
+  function idx(n){ return H.indexOf(n); }
+  function tnum(v){ if (v instanceof Date) return v.getTime(); var d = new Date(v); return isNaN(d.getTime()) ? 0 : d.getTime(); }
+  function pick(o, k, v){ if (v !== '' && v != null && (o[k] === '' || o[k] == null)) o[k] = v; }
+
+  var iTs=idx('Timestamp'), iEvt=idx('Event'), iVis=idx('Visitor ID'), iSes=idx('Session ID'),
+      iSec=idx('Section'), iScroll=idx('Scroll depth %'), iDur=idx('Duration (sec)'),
+      iCountry=idx('Country'), iRegion=idx('Region / state'), iCity=idx('City'),
+      iDev=idx('Device type'), iOS=idx('Operating system'), iBr=idx('Browser'), iLang=idx('Language'),
+      iUs=idx('Campaign source'), iUm=idx('Campaign medium'), iUc=idx('Campaign name'),
+      iEmail=idx('Email / link'), iName=idx('Subscriber name'), iStudio=idx('Studio / company'),
+      iRef=idx('Referrer (came from)'), iEng=idx('Engaged trigger');
+
+  var sessions = {};
+  for (var r = 1; r < data.length; r++) {
+    var row = data[r];
+    var sid = row[iSes]; if (!sid) continue;
+    var o = sessions[sid];
+    if (!o) {
+      o = { firstT: null, first: '', visitor: row[iVis], session: sid, country:'', region:'', city:'',
+            device:'', os:'', browser:'', lang:'', us:'', um:'', uc:'', ref:'', sections:{},
+            maxScroll:0, timeOnPage:0, engaged:'No', engagedTrigger:'', cta:'No',
+            subscribed:'No', email:'', name:'', studio:'', events:0 };
+      sessions[sid] = o;
+    }
+    o.events++;
+    var tt = tnum(row[iTs]);
+    if (o.firstT === null || tt < o.firstT) { o.firstT = tt; o.first = row[iTs]; }
+    pick(o,'country',row[iCountry]); pick(o,'region',row[iRegion]); pick(o,'city',row[iCity]);
+    pick(o,'device',row[iDev]); pick(o,'os',row[iOS]); pick(o,'browser',row[iBr]); pick(o,'lang',row[iLang]);
+    pick(o,'us',row[iUs]); pick(o,'um',row[iUm]); pick(o,'uc',row[iUc]); pick(o,'ref',row[iRef]);
+    var evt = row[iEvt];
+    if (evt === 'section_view' && row[iSec]) o.sections[row[iSec]] = 1;
+    if (evt === 'scroll_depth') { var p = Number(row[iScroll]) || 0; if (p > o.maxScroll) o.maxScroll = p; }
+    if (evt === 'time_on_page') { var t = Number(row[iDur]) || 0; if (t > o.timeOnPage) o.timeOnPage = t; }
+    if (evt === 'engaged') { o.engaged = 'Yes'; if (row[iEng]) o.engagedTrigger = row[iEng]; }
+    if (evt === 'cta_talk_to_team') o.cta = 'Yes';
+    if (evt === 'subscribe') { o.subscribed = 'Yes'; pick(o,'email',row[iEmail]); pick(o,'name',row[iName]); pick(o,'studio',row[iStudio]); }
+  }
+
+  var out = [[ 'First seen','Visitor ID','Session ID','Country','Region / state','City','Device','OS',
+    'Browser','Language','Campaign source','Campaign medium','Campaign name','Sections viewed',
+    'Max scroll %','Time on page (sec)','Engaged','Engaged trigger','Clicked CTA','Subscribed',
+    'Email','Name','Studio','Referrer','# events' ]];
+  var keys = Object.keys(sessions);
+  keys.sort(function(a,b){ return sessions[b].firstT - sessions[a].firstT; }); // newest visit first
+  keys.forEach(function(k){
+    var o = sessions[k];
+    out.push([ o.first, o.visitor, o.session, o.country, o.region, o.city, o.device, o.os, o.browser,
+      o.lang, o.us, o.um, o.uc, Object.keys(o.sections).length, o.maxScroll, o.timeOnPage, o.engaged,
+      o.engagedTrigger, o.cta, o.subscribed, o.email, o.name, o.studio, o.ref, o.events ]);
+  });
+
+  var sh = ss.getSheetByName('Sessions') || ss.insertSheet('Sessions');
+  sh.clear();
+  sh.getRange(1, 1, out.length, out[0].length).setValues(out);
+  sh.setFrozenRows(1);
+  sh.getRange(1, 1, 1, out[0].length).setFontWeight('bold').setBackground('#7b2ff7').setFontColor('#ffffff');
+  ss.setActiveSheet(sh); ss.moveActiveSheet(1); // put Sessions first
+  return 'Sessions rebuilt: ' + keys.length + ' visit(s)';
+}
+
+// Adds an "Analytics" menu to the Sheet on open (reload the Sheet to see it)
+function onOpen() {
+  SpreadsheetApp.getUi().createMenu('Analytics')
+    .addItem('Rebuild sessions summary', 'rebuildSessions')
+    .addItem('Rebuild column guide', 'createColumnGuide')
+    .addToUi();
+}
