@@ -247,7 +247,6 @@
     /* ─── SECTIONS ─── */
     .section {
       padding: 80px 60px;
-      max-width: calc(var(--content-max) + 120px);
     }
     .section + .section {
       border-top: 1px solid var(--border);
@@ -1159,7 +1158,7 @@
     /* ─── SECTION ART GRID (phone alongside text) ─── */
     .section-art-grid {
       display: grid; grid-template-columns: 1fr 220px; gap: 36px; align-items: start;
-      margin: 28px 0 16px;
+      margin: 28px 0 16px; max-width: 980px;
     }
     .section-art-phone { display: flex; justify-content: center; padding-top: 6px; }
     .section-art-phone .phone { width: 200px; border-radius: 30px; padding: 8px; }
