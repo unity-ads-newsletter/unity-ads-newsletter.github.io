@@ -1433,8 +1433,8 @@
       </aside>
       </div><!-- /hero-grid -->
       <div class="hero-intro">
-        <p>Q1 is usually our softest quarter. Lower budgets, tighter targets, cautious campaigns.</p>
-        <p>This year they didn&rsquo;t. User quality improved across almost every campaign type, on both Android and iOS, and in a few categories scale even topped the holiday peak. That&rsquo;s not a seasonal bump &mdash; it&rsquo;s <strong>Vector</strong>, the AI behind Unity Ads, steadily getting better. (Google Cloud even <a href="https://cloud.google.com/blog/products/compute/whats-new-in-compute-at-next26">highlighted</a> how efficiently Vector now scales real-time AI behind the scenes.) Here&rsquo;s what came out of it.</p>
+        <p>Q1 is usually a slower start to the year &mdash; lower budgets, tighter targets, more cautious campaigns.</p>
+        <p>This year broke the pattern. User quality improved across almost every campaign type, on both Android and iOS, and in a few categories scale even topped the holiday peak. That&rsquo;s not a seasonal bump &mdash; it&rsquo;s <strong>Vector</strong>, the AI behind Unity Ads, steadily getting better. (Google Cloud even <a href="https://cloud.google.com/blog/products/compute/whats-new-in-compute-at-next26">highlighted</a> how efficiently Vector now scales real-time AI behind the scenes.) Here&rsquo;s what came out of it.</p>
       </div>
     </section>
 
@@ -3783,6 +3783,45 @@
 })();
 </script>
 
-<!-- ─── ANALYTICS EVENT TRACKING ─── -->
+<!-- ─── BACK TO TOP ─── -->
+<style>
+  #back-to-top{
+    position:fixed; bottom:24px; right:24px; z-index:9000;
+    width:46px; height:46px; border:none; border-radius:50%; cursor:pointer;
+    background:linear-gradient(135deg,#7b2ff7,#f72f9e); color:#fff;
+    font-size:20px; line-height:1; display:flex; align-items:center; justify-content:center;
+    box-shadow:0 8px 22px rgba(123,47,247,0.38);
+    opacity:0; visibility:hidden; transform:translateY(10px);
+    transition:opacity .25s ease, transform .25s ease, visibility .25s;
+  }
+  #back-to-top.show{ opacity:1; visibility:visible; transform:translateY(0); }
+  #back-to-top:hover{ filter:brightness(1.07); }
+  @media (max-width:900px){ #back-to-top{ bottom:18px; right:18px; width:42px; height:42px; } }
+</style>
+<button id="back-to-top" aria-label="Back to top" title="Back to top">&#8593;</button>
+<script>
+(function(){
+  var btn = document.getElementById('back-to-top');
+  if (!btn) return;
+  function onScroll(){
+    if ((window.scrollY || document.documentElement.scrollTop) > 600) btn.classList.add('show');
+    else btn.classList.remove('show');
+  }
+  document.addEventListener('scroll', onScroll, { passive:true });
+  onScroll();
+  btn.addEventListener('click', function(){
+    // log to GA + Sheet (self-contained, reuses the same visitor/session ids)
+    try {
+      if (typeof window.gtag === 'function') window.gtag('event', 'scroll_to_top');
+      var ep = window.NEWSLETTER_LOG_ENDPOINT;
+      if (ep) {
+        var body = JSON.stringify({ event:'scroll_to_top', visitor:localStorage.getItem('nl_visitor')||'', session:sessionStorage.getItem('nl_session')||'', ts:new Date().toISOString(), path:location.pathname+location.hash });
+        if (navigator.sendBeacon) navigator.sendBeacon(ep, body); else fetch(ep,{method:'POST',mode:'no-cors',keepalive:true,body:body});
+      }
+    } catch(e){}
+    window.scrollTo({ top:0, behavior:'smooth' });
+  });
+})();
+</script>
 </body>
 </html>
