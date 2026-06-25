@@ -8,32 +8,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=UnifrakturCook:wght@700&family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
 
-  <!-- ─── CONFIG: ANALYTICS + SUBSCRIBE ──────────────────────────────────
-       Fill in the three values below. Until each is filled, that piece
-       stays off (no tracking runs, Subscribe link is inert) — safe to ship.
-
-       NEWSLETTER_GA_ID        GA4 Measurement ID, e.g. "G-XXXXXXXXXX"
-                               analytics.google.com → Admin → Data Streams → Web
-       NEWSLETTER_CLARITY_ID   Microsoft Clarity Project ID, e.g. "abc123def4"
-                               clarity.microsoft.com → New project → copy the ID
-       NEWSLETTER_SUBSCRIBE_URL  OPTIONAL. If set to a Google Form URL
-                               (https://forms.gle/...), the "Subscribe" footer
-                               link opens it. If left blank, Subscribe opens the
-                               built-in popup that writes the email straight to
-                               the Analytics Log Sheet (event "subscribe").
-       NEWSLETTER_LOG_ENDPOINT   Google Apps Script web-app URL that logs every
-                               event into the "Analytics Log" Google Sheet you
-                               own. Deploy once (see the script in the repo),
-                               paste the /exec URL here. No GA/Clarity needed.
-       ──────────────────────────────────────────────────────────────────── -->
-  <script>
-    window.NEWSLETTER_GA_ID        = "";
-    window.NEWSLETTER_CLARITY_ID   = "";
-    window.NEWSLETTER_SUBSCRIBE_URL = "";
-    window.NEWSLETTER_LOG_ENDPOINT  = "https://script.google.com/macros/s/AKfycbyf3CRpnZVkn31qjDyF-rdHmgvtvFw4bhdFjHKld6N1esAE8BUVVqhKjvzfuG9ZWKiFTg/exec";
-  </script>
-
-  <!-- GA4 loader -->
+  <!-- ─── ANALYTICS (GA4) ───────────────────────────────────────────────
+       Paste your GA4 Measurement ID (looks like G-XXXXXXXXXX) below.
+       Get one at analytics.google.com → Admin → Data Streams → Web.
+       Until it's filled in, no tracking runs. ──────────────────────────── -->
+  <script>window.NEWSLETTER_GA_ID = "";</script>
   <script>
     (function(){
       var id = window.NEWSLETTER_GA_ID;
@@ -46,16 +25,6 @@
       gtag('js', new Date());
       gtag('config', id);
     })();
-  </script>
-
-  <!-- Microsoft Clarity loader (heatmaps + session recordings) -->
-  <script>
-    (function(c,l,a,r,i,t,y){
-      if (!window.NEWSLETTER_CLARITY_ID) return;
-      c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-      t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-      y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-    })(window,document,"clarity","script",window.NEWSLETTER_CLARITY_ID);
   </script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -875,7 +844,8 @@
 
     /* speedometer needle animation */
     .needle-anim {
-      transform-origin: 300px 165px;
+      transform-box: fill-box;
+      transform-origin: 50% 100%;
       transform: rotate(-90deg);
       transition: transform 1.4s cubic-bezier(0.4,0,0.2,1);
     }
@@ -1104,6 +1074,7 @@
       will-change: transform; cursor: pointer;
     }
     .phone .screen { display: block; width: 100%; height: auto; border-radius: 28px; background: #fff; }
+    .phone canvas.screen { aspect-ratio: 210 / 410; height: auto; }
     .phone-wrap:nth-child(1) .phone { --rot: -7deg; }
     .phone-wrap:nth-child(2) .phone { --rot: 0deg; }
     .phone-wrap:nth-child(3) .phone { --rot: 7deg; }
@@ -1114,6 +1085,22 @@
     .phone:hover { transform: translateY(-14px) rotate(0deg) scale(1.04) !important; box-shadow: 0 56px 96px -34px rgba(123,47,247,0.5); }
     .phone-cap { margin-top: 18px; font-size: 13px; font-weight: 700; color: var(--text); }
     .phone-cap span { display: block; font-weight: 500; color: var(--muted); font-size: 12px; margin-top: 2px; }
+
+    /* ─── INTERACTIVE PLAYABLE ─── */
+    .playable-demo { margin-top: 60px; text-align: center; }
+    .playable-kicker { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--purple); margin-bottom: 12px; }
+    .playable-phone-frame {
+      display: inline-block;
+      width: 210px;
+      height: 410px;
+      border-radius: 34px;
+      overflow: hidden;
+      box-shadow: 0 32px 72px -16px rgba(124,58,237,0.45), 0 0 0 1px rgba(124,58,237,0.15);
+      background: #0d0520;
+      cursor: none;
+      position: relative;
+    }
+    #gem-canvas { display: block; width: 210px; height: 410px; touch-action: none; }
 
     /* ─── PERFORMANCE STATS STRIP (below phones) ─── */
     .perf-strip {
@@ -1545,36 +1532,12 @@
       </div>
       <div class="phones">
 
-        <!-- PHONE 1 — Jewel Coloring -->
+        <!-- PHONE 1 — Jewel Coloring (INTERACTIVE) -->
         <div class="phone-wrap">
           <div class="phone">
-            <svg class="screen" viewBox="0 0 210 410" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Jewel Coloring playable ad mockup">
-              <rect width="210" height="410" rx="26" fill="#f4eefe"/>
-              <rect x="0" y="0" width="210" height="42" fill="#ffffff"/>
-              <circle cx="22" cy="21" r="9" fill="#ffd24d"/><text x="22" y="25" font-family="Inter,Arial" font-size="11" text-anchor="middle">🏆</text>
-              <text x="40" y="25" font-family="Inter,Arial" font-size="10.5" font-weight="700" fill="#3a3a4e">Jewel Coloring</text>
-              <!-- bead heart -->
-              <g>
-                <circle cx="55"  cy="110" r="11" fill="#f72f9e"/><circle cx="155" cy="110" r="11" fill="#f72f9e"/>
-                <circle cx="55"  cy="135" r="11" fill="#ff5e8a"/><circle cx="80" cy="135" r="11" fill="#ff5e8a"/><circle cx="130" cy="135" r="11" fill="#ff5e8a"/><circle cx="155" cy="135" r="11" fill="#ff5e8a"/>
-                <circle cx="55"  cy="160" r="11" fill="#b324d6"/><circle cx="80" cy="160" r="11" fill="#f72f9e"/><circle cx="105" cy="160" r="11" fill="#ff5e8a"/><circle cx="130" cy="160" r="11" fill="#f72f9e"/><circle cx="155" cy="160" r="11" fill="#b324d6"/>
-                <circle cx="80"  cy="185" r="11" fill="#b324d6"/><circle cx="105" cy="185" r="11" fill="#f72f9e"/><circle cx="130" cy="185" r="11" fill="#b324d6"/>
-                <circle cx="105" cy="210" r="11" fill="#b324d6"/>
-              </g>
-              <!-- empty bead outlines -->
-              <g fill="none" stroke="#d9cdf0" stroke-width="2">
-                <circle cx="80" cy="110" r="11"/><circle cx="105" cy="110" r="11"/><circle cx="130" cy="110" r="11"/>
-                <circle cx="105" cy="135" r="11"/>
-              </g>
-              <!-- palette -->
-              <rect x="30" y="300" width="150" height="40" rx="20" fill="#ffffff"/>
-              <circle cx="55" cy="320" r="11" fill="#f72f9e"/><circle cx="85" cy="320" r="11" fill="#ff5e8a"/><circle cx="115" cy="320" r="11" fill="#b324d6"/><circle cx="145" cy="320" r="11" fill="#ffd24d" stroke="#fff" stroke-width="2"/>
-              <!-- play button -->
-              <rect x="55" y="360" width="100" height="30" rx="15" fill="#22c55e"/>
-              <text x="105" y="380" font-family="Inter,Arial" font-size="13" font-weight="800" fill="#ffffff" text-anchor="middle">Play Now</text>
-            </svg>
+            <canvas id="jewel-canvas" class="screen" width="210" height="410" style="background:#f4eefe;cursor:pointer;touch-action:none;"></canvas>
           </div>
-          <div class="phone-cap">Jewel Coloring<span>Playable · tap-to-fill</span></div>
+          <div class="phone-cap">Jewel Coloring<span>Playable · tap to color ✦ live</span></div>
         </div>
 
         <!-- PHONE 2 — Arrowscapes (maze) -->
@@ -1604,37 +1567,12 @@
           <div class="phone-cap">Arrowscapes<span>Playable · path puzzle</span></div>
         </div>
 
-        <!-- PHONE 3 — Parking Jam -->
+        <!-- PHONE 3 — Parking Jam (INTERACTIVE) -->
         <div class="phone-wrap">
           <div class="phone">
-            <svg class="screen" viewBox="0 0 210 410" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Parking Jam playable ad mockup">
-              <rect width="210" height="410" rx="26" fill="#e9ecf3"/>
-              <rect x="0" y="0" width="210" height="42" fill="#ffffff"/>
-              <text x="22" y="25" font-family="Inter,Arial" font-size="11" text-anchor="middle">🏆</text>
-              <text x="40" y="25" font-family="Inter,Arial" font-size="10.5" font-weight="700" fill="#3a3a4e">Parking Jam</text>
-              <!-- lot -->
-              <rect x="24" y="60" width="162" height="230" rx="12" fill="#c9cfdb"/>
-              <g stroke="#aeb6c6" stroke-width="2" stroke-dasharray="5 6">
-                <path d="M24 110H186M24 160H186M24 210H186M24 260H186"/>
-              </g>
-              <!-- cars -->
-              <rect x="36" y="72"  width="44" height="28" rx="7" fill="#ef4444"/>
-              <rect x="96" y="72"  width="78" height="28" rx="7" fill="#3b82f6"/>
-              <rect x="36" y="122" width="78" height="28" rx="7" fill="#22c55e"/>
-              <rect x="130" y="122" width="44" height="28" rx="7" fill="#f59e0b"/>
-              <rect x="36" y="172" width="44" height="28" rx="7" fill="#a855f7"/>
-              <rect x="96" y="172" width="44" height="28" rx="7" fill="#ec4899"/>
-              <rect x="150" y="172" width="24" height="28" rx="7" fill="#14b8a6"/>
-              <rect x="36" y="222" width="60" height="28" rx="7" fill="#eab308"/>
-              <rect x="112" y="222" width="62" height="28" rx="7" fill="#ef4444"/>
-              <!-- exit arrow -->
-              <path d="M150 300 v22 M150 300 l-9 10 M150 300 l9 10" stroke="#22c55e" stroke-width="5" fill="none" stroke-linecap="round"/>
-              <!-- play button -->
-              <rect x="55" y="350" width="100" height="30" rx="15" fill="#2563eb"/>
-              <text x="105" y="370" font-family="Inter,Arial" font-size="13" font-weight="800" fill="#ffffff" text-anchor="middle">Play Now</text>
-            </svg>
+            <canvas id="parking-canvas" class="screen" width="210" height="410" style="background:#1a1a2e;cursor:grab;touch-action:none;"></canvas>
           </div>
-          <div class="phone-cap">Parking Jam<span>Playable · unblock-the-exit</span></div>
+          <div class="phone-cap">Parking Jam<span>Playable · drag to escape ✦ live</span></div>
         </div>
 
         <!-- PHONE 4 — Video Ad (Galaxy Strike) -->
@@ -1703,6 +1641,17 @@
           <div class="phone-cap">Galaxy Strike<span>Video · cinematic RPG ad</span></div>
         </div>
 
+      </div>
+
+      <!-- ─── INTERACTIVE PLAYABLE ─── -->
+      <div class="playable-demo fade-up">
+        <div class="playable-kicker">&#10022; Live &mdash; try it now</div>
+        <p style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:6px;line-height:1.3;">A real playable ad &mdash; right in your newsletter</p>
+        <p style="font-size:14px;color:var(--muted);margin-bottom:28px;max-width:480px;margin-left:auto;margin-right:auto;">Move your cursor over the screen to play. This is exactly how a playable ad works &mdash; instant engagement, no download needed.</p>
+        <div class="playable-phone-frame" id="playable-frame">
+          <canvas id="gem-canvas" width="210" height="410"></canvas>
+        </div>
+        <p style="margin-top:16px;font-size:12px;color:var(--muted);">Playables drive <strong style="color:var(--text);">20&times; more installs</strong> than static banners</p>
       </div>
 
       <!-- Performance stats strip -->
@@ -2293,7 +2242,7 @@
       </div>
 
       <!-- tROAS Bid Tiers -->
-      <span class="tapjoy-sub-label fade-up">tROAS Offerwall bidding</span>
+      <span class="tapjoy-sub-label fade-up">tROAS Offerwall bidding &nbsp;<span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:rgba(247,47,158,0.12);color:#f72f9e;letter-spacing:0.04em;white-space:nowrap;text-transform:none;">Daily Reward only</span></span>
       <div class="troas-split fade-up d2">
 
         <!-- Current: flat bid -->
@@ -2782,7 +2731,7 @@
       <div class="cta-box">
         <div class="cta-title fade-up">Not sure where to start?</div>
         <div class="cta-body fade-up d2">There&rsquo;s no single right answer &mdash; the best next step depends on your monetization model and where your biggest gaps are today. Your Unity team is happy to look at your setup with you and figure out what&rsquo;s worth doing first.</div>
-        <a href="https://unity.com/contact-us" target="_blank" rel="noopener" class="cta-btn fade-up d3">Talk to your Unity team</a>
+        <a href="mailto:alon.halva@unity3d.com?subject=Unity%20Ads%20%E2%80%94%20let%27s%20talk%20about%20my%20setup&amp;body=Hi%20Alon%2C%0A%0AI%27d%20love%20to%20go%20over%20what%27s%20worth%20doing%20first%20for%20my%20game.%0A%0A" class="cta-btn fade-up d3">Talk to your Unity team</a>
       </div>
     </section>
 
@@ -2791,50 +2740,11 @@
       <p class="footer-disclaimer">Performance figures above come from internal Unity analyses and beta cohorts. They&rsquo;re real results we&rsquo;ve observed &mdash; not guaranteed outcomes. Your mileage depends on your game, traffic, and setup.</p>
       <p class="footer-sign">Thanks for reading. More soon. &mdash; The Unity Ads team</p>
       <p class="footer-links">
-        <a id="subscribe-link" href="#subscribe" rel="noopener">Subscribe</a> &nbsp;&middot;&nbsp; Unity Technologies
+        <a href="https://create.unity.com/Unity_MyPage_W_AccountID" target="_blank" rel="noopener">Manage preferences</a> &nbsp;&middot;&nbsp; <a href="unsubscribe.html">Unsubscribe</a> &nbsp;&middot;&nbsp; Unity Technologies
       </p>
     </footer>
 
   </main>
-</div>
-
-<!-- ═══ SUBSCRIBE POPUP (used when no external NEWSLETTER_SUBSCRIBE_URL is set) ═══ -->
-<style>
-  .nlsub-overlay{position:fixed;inset:0;background:rgba(13,10,20,.6);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:9999;padding:20px;}
-  .nlsub-overlay.open{display:flex;}
-  .nlsub-modal{position:relative;background:#fff;border-radius:20px;max-width:420px;width:100%;padding:38px 32px 32px;box-shadow:0 24px 64px rgba(13,10,20,.32);font-family:'Inter',sans-serif;}
-  .nlsub-close{position:absolute;top:12px;right:16px;background:none;border:none;font-size:28px;line-height:1;color:#9b9bad;cursor:pointer;}
-  .nlsub-close:hover{color:#1a1a2e;}
-  .nlsub-title{font-size:26px;font-weight:800;color:#1a1a2e;margin:0 0 6px;}
-  .nlsub-sub{font-size:15px;line-height:1.4;color:#6b6b80;margin:0 0 20px;}
-  .nlsub-input{width:100%;padding:13px 16px;font-size:15px;border:1.5px solid #e2e0ee;border-radius:12px;font-family:inherit;color:#1a1a2e;outline:none;}
-  .nlsub-input:focus{border-color:#7b2ff7;}
-  .nlsub-btn{width:100%;margin-top:12px;padding:14px;font-size:15px;font-weight:700;color:#fff;background:linear-gradient(135deg,#7b2ff7,#f72f9e);border:none;border-radius:999px;cursor:pointer;}
-  .nlsub-btn:hover{opacity:.92;}
-  .nlsub-err{color:#f72f9e;font-size:13px;margin:10px 0 0;min-height:16px;}
-  .nlsub-consent{font-size:11px;line-height:1.4;color:#9b9bad;margin:14px 0 0;}
-  .nlsub-done{text-align:center;padding:8px 0;}
-  .nlsub-check{width:56px;height:56px;margin:0 auto 14px;border-radius:50%;background:linear-gradient(135deg,#7b2ff7,#f72f9e);color:#fff;font-size:30px;display:flex;align-items:center;justify-content:center;}
-  .nlsub-done p{font-size:17px;font-weight:600;color:#1a1a2e;margin:0;}
-</style>
-<div id="nlsub-overlay" class="nlsub-overlay" aria-hidden="true">
-  <div class="nlsub-modal" role="dialog" aria-modal="true" aria-labelledby="nlsub-title">
-    <button type="button" class="nlsub-close" id="nlsub-close" aria-label="Close">&times;</button>
-    <div id="nlsub-form">
-      <h3 id="nlsub-title" class="nlsub-title">Subscribe</h3>
-      <p class="nlsub-sub">Get the next Unity Ads update in your inbox &mdash; no spam, just what&rsquo;s new.</p>
-      <input type="text" id="nlsub-name" class="nlsub-input" placeholder="Your name (optional)" autocomplete="name">
-      <input type="text" id="nlsub-studio" class="nlsub-input" placeholder="Studio / company (optional)" autocomplete="organization" style="margin-top:10px;">
-      <input type="email" id="nlsub-email" class="nlsub-input" placeholder="you@studio.com" autocomplete="email" required style="margin-top:10px;">
-      <button type="button" id="nlsub-submit" class="nlsub-btn">Subscribe</button>
-      <p class="nlsub-err" id="nlsub-err"></p>
-      <p class="nlsub-consent">By subscribing you agree we may store your details to send you Unity Ads updates. Unsubscribe anytime.</p>
-    </div>
-    <div id="nlsub-done" class="nlsub-done" style="display:none;">
-      <div class="nlsub-check">&#10003;</div>
-      <p>Thanks &mdash; you&rsquo;re on the list.</p>
-    </div>
-  </div>
 </div>
 
 <script>
@@ -3083,107 +2993,13 @@
 <!-- ─── ANALYTICS EVENT TRACKING ─── -->
 <script>
 (function(){
-  // One visitor id per browser (counts unique visitors / "logins") + one session id
-  function uid(k, store){
-    try {
-      var v = store.getItem(k);
-      if (!v) { v = (Date.now().toString(36) + Math.random().toString(36).slice(2, 8)); store.setItem(k, v); }
-      return v;
-    } catch(e){ return 'anon'; }
-  }
-  var visitorId = uid('nl_visitor', window.localStorage);
-  var sessionId = uid('nl_session', window.sessionStorage);
-
-  // Visitor context available immediately (device / browser / language / timezone)
-  var ua = navigator.userAgent || '';
-  function parseBrowser(u){ if(/edg/i.test(u))return'Edge'; if(/opr|opera/i.test(u))return'Opera'; if(/chrome|crios/i.test(u))return'Chrome'; if(/firefox|fxios/i.test(u))return'Firefox'; if(/safari/i.test(u))return'Safari'; return'Other'; }
-  function parseOS(u){ if(/windows/i.test(u))return'Windows'; if(/iphone|ipad|ipod/i.test(u))return'iOS'; if(/android/i.test(u))return'Android'; if(/mac os/i.test(u))return'macOS'; if(/linux/i.test(u))return'Linux'; return'Other'; }
-  // Campaign attribution — read utm_*/gclid/fbclid from the URL on the first
-  // landing and remember them for the whole session (so they stay attached even
-  // after reloads or hash navigation).
-  var utm = (function(){
-    var keys = ['utm_source','utm_medium','utm_campaign','utm_term','utm_content','gclid','fbclid'];
-    var out = {};
-    try {
-      var stored = JSON.parse(sessionStorage.getItem('nl_utm') || '{}');
-      var qs = new URLSearchParams(location.search);
-      var sawNew = false;
-      keys.forEach(function(k){
-        var v = qs.get(k);
-        if (v) { out[k] = v; sawNew = true; }
-        else if (stored[k]) { out[k] = stored[k]; }
-      });
-      if (sawNew) { sessionStorage.setItem('nl_utm', JSON.stringify(out)); }
-      else { out = stored; }
-    } catch(e){}
-    return out;
-  })();
-
-  var ctx = Object.assign({
-    lang: navigator.language || '',
-    tz: (function(){ try { return Intl.DateTimeFormat().resolvedOptions().timeZone; } catch(e){ return ''; } })(),
-    os: parseOS(ua),
-    browser: parseBrowser(ua),
-    device: /mobile|android|iphone|ipad|ipod/i.test(ua) ? 'mobile' : 'desktop'
-  }, utm);
-  var geo = {}; // populated asynchronously from IP lookup (country / region / city / isp)
-
   function track(name, params){
-    params = params || {};
-    // 1) GA4 (only if a Measurement ID is configured)
-    if (typeof window.gtag === 'function') { window.gtag('event', name, params); }
-    // 2) Self-hosted log → your Google Sheet (only if an endpoint is configured)
-    var ep = window.NEWSLETTER_LOG_ENDPOINT;
-    if (ep) {
-      var payload = Object.assign({
-        event: name, visitor: visitorId, session: sessionId,
-        ts: new Date().toISOString(), path: location.pathname + location.hash,
-        ref: document.referrer || '', w: window.innerWidth, h: window.innerHeight
-      }, ctx, geo, params);
-      try {
-        var body = JSON.stringify(payload);
-        if (navigator.sendBeacon) { navigator.sendBeacon(ep, body); }
-        else { fetch(ep, { method: 'POST', mode: 'no-cors', keepalive: true, body: body }); }
-      } catch(e){}
-    }
+    if (typeof window.gtag === 'function') { window.gtag('event', name, params || {}); }
   }
 
-  // Count the visit as soon as the page loads
-  track('page_view');
-
-  // Engagement: fire once per session when the visitor crosses a real-interest
-  // threshold — 15s on page, OR 50% scroll, OR a click (whichever comes first).
-  var engagedFired = false;
-  function markEngaged(reason){
-    if (engagedFired) return;
-    try { if (sessionStorage.getItem('nl_engaged')) { engagedFired = true; return; } } catch(e){}
-    engagedFired = true;
-    try { sessionStorage.setItem('nl_engaged', '1'); } catch(e){}
-    track('engaged', { reason: reason });
-  }
-  setTimeout(function(){ markEngaged('time_15s'); }, 15000);
-
-  // Approximate location from IP (best-effort, no key). Once resolved, it's
-  // attached to every later event, plus one visitor_info row with the full picture.
-  try {
-    fetch('https://ipwho.is/?fields=success,ip,country,country_code,region,city,connection')
-      .then(function(r){ return r.json(); })
-      .then(function(d){
-        if (d && d.success !== false) {
-          geo = {
-            ip: d.ip || '', country: d.country || '', country_code: d.country_code || '',
-            region: d.region || '', city: d.city || '',
-            isp: (d.connection && (d.connection.isp || d.connection.org)) || ''
-          };
-          track('visitor_info');
-        }
-      })
-      .catch(function(){});
-  } catch(e){}
-
-  // Primary CTA: "Talk to your Unity team" (→ unity.com/contact-us) — the conversation goal
-  document.querySelectorAll('a.cta-btn').forEach(function(a){
-    a.addEventListener('click', function(){ markEngaged('cta_click'); track('cta_talk_to_team'); });
+  // Primary CTA: "Talk to your Unity team" (mailto) — the conversation goal
+  document.querySelectorAll('a[href^="mailto:"]').forEach(function(a){
+    a.addEventListener('click', function(){ track('cta_talk_to_team'); });
   });
 
   // "At a glance" index clicks — which topics pull interest
@@ -3196,40 +3012,11 @@
     a.addEventListener('click', function(){ track('nav_click', { section: a.getAttribute('data-section') }); });
   });
 
-  // Subscribe (footer): if an external Form URL is configured, open it;
-  // otherwise open the built-in popup that writes the email to the Sheet.
-  var sub = document.getElementById('subscribe-link');
-  var overlay = document.getElementById('nlsub-overlay');
-  function openSub(){ if (overlay) { overlay.classList.add('open'); overlay.setAttribute('aria-hidden','false'); var i = document.getElementById('nlsub-email'); if (i) i.focus(); } }
-  function closeSub(){ if (overlay) { overlay.classList.remove('open'); overlay.setAttribute('aria-hidden','true'); } }
-  if (sub) {
-    var subUrl = window.NEWSLETTER_SUBSCRIBE_URL;
-    if (subUrl) { sub.setAttribute('href', subUrl); sub.setAttribute('target', '_blank'); }
-    sub.addEventListener('click', function(e){
-      if (window.NEWSLETTER_SUBSCRIBE_URL) { track('subscribe_click'); return; }
-      e.preventDefault(); track('subscribe_open'); openSub();
-    });
-  }
-  if (overlay) {
-    var closeBtn = document.getElementById('nlsub-close');
-    if (closeBtn) closeBtn.addEventListener('click', closeSub);
-    overlay.addEventListener('click', function(e){ if (e.target === overlay) closeSub(); });
-    document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeSub(); });
-    var submit = document.getElementById('nlsub-submit');
-    if (submit) submit.addEventListener('click', function(){
-      var email = (document.getElementById('nlsub-email').value || '').trim();
-      var name = (document.getElementById('nlsub-name').value || '').trim();
-      var studio = (document.getElementById('nlsub-studio').value || '').trim();
-      var err = document.getElementById('nlsub-err');
-      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { err.textContent = 'Please enter a valid email.'; return; }
-      err.textContent = '';
-      // email lands in the 'url' column; name/studio get their own columns
-      track('subscribe', { url: email, name: name, studio: studio });
-      document.getElementById('nlsub-form').style.display = 'none';
-      document.getElementById('nlsub-done').style.display = 'block';
-      setTimeout(closeSub, 2200);
-    });
-  }
+  // Manage preferences / Unsubscribe
+  var pref = document.querySelector('a[href*="create.unity.com"]');
+  if (pref) pref.addEventListener('click', function(){ track('manage_preferences_click'); });
+  var unsub = document.querySelector('a[href="unsubscribe.html"]');
+  if (unsub) unsub.addEventListener('click', function(){ track('unsubscribe_click'); });
 
   // Outbound case-study / reference links
   document.querySelectorAll('a[href^="http"]').forEach(function(a){
@@ -3238,51 +3025,657 @@
     }
   });
 
-  // Scroll-depth milestones — engagement / how far they read (session depth)
+  // Scroll-depth milestones — engagement / how far they read
   var marks = [25, 50, 75, 100], hit = {};
   function onScroll(){
     var d = document.documentElement;
     var max = d.scrollHeight - d.clientHeight;
     if (max <= 0) return;
     var pct = (d.scrollTop / max) * 100;
-    marks.forEach(function(m){ if (!hit[m] && pct >= m) { hit[m] = 1; track('scroll_depth', { percent: m }); if (m >= 50) markEngaged('scroll_50'); } });
+    marks.forEach(function(m){ if (!hit[m] && pct >= m) { hit[m] = 1; track('scroll_depth', { percent: m }); } });
   }
   document.addEventListener('scroll', onScroll, { passive: true });
+})();
+</script>
+<!-- ─── JEWEL COLORING INTERACTIVE ─── -->
+<script>
+(function(){
+  var canvas=document.getElementById('jewel-canvas');
+  if(!canvas||!canvas.getContext) return;
+  var ctx=canvas.getContext('2d');
+  var W=210,H=410;
+  var DPR=Math.ceil(window.devicePixelRatio||1);
+  canvas.width=W*DPR; canvas.height=H*DPR;
+  ctx.scale(DPR,DPR);
+  var PAL=['#f72f9e','#ff5e8a','#b324d6','#ffd24d'];
+  var sel='#f72f9e';
+  var state='playing';
 
-  // Section views + dwell time — WHERE people go and WHERE they pause
-  var seen = {}, enterAt = {}, dwell = {};
-  if ('IntersectionObserver' in window) {
-    var io = new IntersectionObserver(function(entries){
-      entries.forEach(function(en){
-        var id = en.target.id;
-        if (!id) return;
-        if (en.isIntersecting) {
-          enterAt[id] = Date.now();
-          if (!seen[id]) { seen[id] = 1; track('section_view', { section: id }); }
-        } else if (enterAt[id]) {
-          dwell[id] = (dwell[id] || 0) + (Date.now() - enterAt[id]);
-          enterAt[id] = 0;
-        }
+  var beads=[
+    {x:55,y:110,r:11,color:'#f72f9e',empty:false},
+    {x:155,y:110,r:11,color:'#f72f9e',empty:false},
+    {x:55,y:135,r:11,color:'#ff5e8a',empty:false},
+    {x:80,y:135,r:11,color:'#ff5e8a',empty:false},
+    {x:130,y:135,r:11,color:'#ff5e8a',empty:false},
+    {x:155,y:135,r:11,color:'#ff5e8a',empty:false},
+    {x:55,y:160,r:11,color:'#b324d6',empty:false},
+    {x:80,y:160,r:11,color:'#f72f9e',empty:false},
+    {x:105,y:160,r:11,color:'#ff5e8a',empty:false},
+    {x:130,y:160,r:11,color:'#f72f9e',empty:false},
+    {x:155,y:160,r:11,color:'#b324d6',empty:false},
+    {x:80,y:185,r:11,color:'#b324d6',empty:false},
+    {x:105,y:185,r:11,color:'#f72f9e',empty:false},
+    {x:130,y:185,r:11,color:'#b324d6',empty:false},
+    {x:105,y:210,r:11,color:'#b324d6',empty:false},
+    {x:80,y:110,r:11,color:null,empty:true},
+    {x:105,y:110,r:11,color:null,empty:true},
+    {x:130,y:110,r:11,color:null,empty:true},
+    {x:105,y:135,r:11,color:null,empty:true}
+  ];
+  var INIT_EMPTY=beads.filter(function(b){return b.empty;}).length;
+
+  function rrect(x,y,w,h,r){
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);
+    ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
+    ctx.lineTo(x+r,y+h);ctx.arcTo(x,y+h,x,y+h-r,r);
+    ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);ctx.closePath();
+  }
+
+  function draw(){
+    ctx.fillStyle='#f4eefe';ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='#fff';ctx.fillRect(0,0,W,42);
+    ctx.beginPath();ctx.arc(22,21,9,0,6.28);ctx.fillStyle='#ffd24d';ctx.fill();
+    ctx.font='700 10.5px Inter,Arial';ctx.fillStyle='#3a3a4e';ctx.textAlign='left';
+    ctx.fillText('Jewel Coloring',38,26);
+
+    var remaining=beads.filter(function(b){return b.empty&&!b.color;}).length;
+
+    if(state==='win'){
+      beads.forEach(function(b){
+        ctx.shadowColor=b.color;ctx.shadowBlur=10;
+        ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,6.28);
+        ctx.fillStyle=b.color;ctx.fill();
+        ctx.shadowBlur=0;
+        ctx.beginPath();ctx.arc(b.x-b.r*0.3,b.y-b.r*0.35,b.r*0.28,0,6.28);
+        ctx.fillStyle='rgba(255,255,255,0.45)';ctx.fill();
       });
-    }, { threshold: 0.5 });
-    document.querySelectorAll('section[id]').forEach(function(s){ io.observe(s); });
+      ctx.fillStyle='rgba(244,238,254,0.88)';ctx.fillRect(0,240,W,H-240);
+      ctx.font='800 16px Arial';ctx.fillStyle='#3a3a4e';ctx.textAlign='center';
+      ctx.fillText('Beautiful! ✨',W/2,278);
+      ctx.shadowColor='#22c55e';ctx.shadowBlur=12;
+      rrect(35,294,140,38,19);ctx.fillStyle='#22c55e';ctx.fill();ctx.shadowBlur=0;
+      ctx.font='800 13px Arial';ctx.fillStyle='#fff';ctx.fillText('Download Now →',W/2,318);
+      ctx.font='500 9px Arial';ctx.fillStyle='#9ca3af';ctx.fillText('Powered by Unity Ads',W/2,H-22);
+      ctx.textAlign='left';return;
+    }
+
+    beads.forEach(function(b){
+      ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,6.28);
+      if(b.color){
+        ctx.fillStyle=b.color;ctx.fill();
+        ctx.beginPath();ctx.arc(b.x-b.r*0.3,b.y-b.r*0.35,b.r*0.28,0,6.28);
+        ctx.fillStyle='rgba(255,255,255,0.45)';ctx.fill();
+      } else {
+        ctx.strokeStyle='#d9cdf0';ctx.lineWidth=2;ctx.stroke();
+        if(b.empty){
+          ctx.fillStyle='rgba(147,51,234,0.06)';ctx.fill();
+        }
+      }
+    });
+
+    rrect(30,298,150,42,21);ctx.fillStyle='#fff';ctx.fill();
+    var PX=[55,85,115,145];
+    PX.forEach(function(x,i){
+      ctx.beginPath();ctx.arc(x,320,11,0,6.28);
+      ctx.fillStyle=PAL[i];ctx.fill();
+      if(PAL[i]===sel){
+        ctx.strokeStyle='#1a1a2e';ctx.lineWidth=2.5;ctx.stroke();
+        ctx.beginPath();ctx.arc(x,320,14,0,6.28);
+        ctx.strokeStyle='rgba(26,26,46,0.2)';ctx.lineWidth=1;ctx.stroke();
+      }
+    });
+
+    ctx.font='600 10px Inter,Arial';ctx.fillStyle='#a78bfa';ctx.textAlign='center';
+    ctx.fillText(remaining>0?'Tap a color then tap the empty beads':'','105',375);
+    ctx.fillText(remaining>0?remaining+' bead'+(remaining>1?'s':'')+' left':'',105,390);
+    ctx.textAlign='left';
   }
 
-  // Time on page + per-section dwell — HOW LONG they spent (sent once, on leave)
-  var pageStart = Date.now(), sentExit = false;
-  function flushExit(){
-    if (sentExit) return; sentExit = true;
-    // close out any section still in view
-    Object.keys(enterAt).forEach(function(id){
-      if (enterAt[id]) { dwell[id] = (dwell[id] || 0) + (Date.now() - enterAt[id]); }
+  function evtPos(e){
+    var rect=canvas.getBoundingClientRect();
+    var scX=W/rect.width,scY=H/rect.height;
+    var src=e.changedTouches?e.changedTouches[0]:(e.touches?e.touches[0]:e);
+    return{x:(src.clientX-rect.left)*scX,y:(src.clientY-rect.top)*scY};
+  }
+
+  function onTap(e){
+    e.preventDefault();
+    var p=evtPos(e);
+    if(state==='win'){
+      beads.forEach(function(b){if(b.empty){b.color=null;}});
+      state='playing';draw();return;
+    }
+    var PX=[55,85,115,145];
+    for(var i=0;i<PX.length;i++){
+      if(Math.hypot(p.x-PX[i],p.y-320)<20){sel=PAL[i];draw();return;}
+    }
+    for(var j=0;j<beads.length;j++){
+      var b=beads[j];
+      if(b.empty&&!b.color&&Math.hypot(p.x-b.x,p.y-b.y)<b.r+8){
+        b.color=sel;
+        var done=beads.every(function(bb){return !bb.empty||bb.color;});
+        if(done) state='win';
+        draw();return;
+      }
+    }
+    draw();
+  }
+
+  canvas.addEventListener('click',onTap);
+  canvas.addEventListener('touchend',onTap,{passive:false});
+  draw();
+})();
+</script>
+
+<!-- ─── PARKING JAM INTERACTIVE ─── -->
+<script>
+(function(){
+  var canvas=document.getElementById('parking-canvas');
+  if(!canvas||!canvas.getContext) return;
+  var ctx=canvas.getContext('2d');
+  var W=210,H=410;
+  var DPR=Math.ceil(window.devicePixelRatio||1);
+  canvas.width=W*DPR; canvas.height=H*DPR;
+  ctx.scale(DPR,DPR);
+  var CELL=32,GX=9,GY=52,COLS=6,ROWS=6;
+  var state='playing';
+  var moves=0;
+
+  var INIT=[
+    {id:'t',color:'#ef4444',dir:'h',row:2,col:0,size:2,isTarget:true},
+    {id:'a',color:'#3b82f6',dir:'v',row:0,col:2,size:3},
+    {id:'b',color:'#f59e0b',dir:'h',row:1,col:3,size:2},
+    {id:'c',color:'#22c55e',dir:'v',row:3,col:4,size:2},
+    {id:'d',color:'#a855f7',dir:'h',row:5,col:0,size:3}
+  ];
+  var cars;
+  function reset(){
+    cars=INIT.map(function(c){return{id:c.id,color:c.color,dir:c.dir,row:c.row,col:c.col,size:c.size,isTarget:!!c.isTarget};});
+    moves=0;
+  }
+  reset();
+
+  var drag=null,dmx=0,dmy=0,dsc=0,dsr=0,dragMoved=false;
+
+  function rrect(x,y,w,h,r){
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);
+    ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
+    ctx.lineTo(x+r,y+h);ctx.arcTo(x,y+h,x,y+h-r,r);
+    ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);ctx.closePath();
+  }
+
+  function occupied(row,col,skip){
+    for(var i=0;i<cars.length;i++){
+      var c=cars[i];if(c.id===skip)continue;
+      for(var s=0;s<c.size;s++){
+        var r=c.dir==='h'?c.row:c.row+s;
+        var cl=c.dir==='h'?c.col+s:c.col;
+        if(r===row&&cl===col)return true;
+      }
+    }
+    return false;
+  }
+
+  function clampH(car,nc){
+    nc=Math.max(0,Math.min(COLS-car.size,nc));
+    var step=nc>=car.col?1:-1,try_=nc;
+    while(try_!==car.col){
+      var ok=true;
+      for(var c2=try_;c2<try_+car.size;c2++)if(occupied(car.row,c2,car.id)){ok=false;break;}
+      if(ok)return try_;
+      try_-=step;
+    }
+    return car.col;
+  }
+
+  function clampV(car,nr){
+    nr=Math.max(0,Math.min(ROWS-car.size,nr));
+    var step=nr>=car.row?1:-1,try_=nr;
+    while(try_!==car.row){
+      var ok=true;
+      for(var r2=try_;r2<try_+car.size;r2++)if(occupied(r2,car.col,car.id)){ok=false;break;}
+      if(ok)return try_;
+      try_-=step;
+    }
+    return car.row;
+  }
+
+  var GRID_BOTTOM=GY+ROWS*CELL; /* =244 */
+
+  function draw(){
+    /* background */
+    ctx.fillStyle='#0f172a';ctx.fillRect(0,0,W,H);
+
+    /* header */
+    ctx.fillStyle='#1e293b';ctx.fillRect(0,0,W,GY-4);
+    ctx.font='800 11px Inter,Arial';ctx.fillStyle='#f1f5f9';ctx.textAlign='left';
+    ctx.fillText('Parking Jam',12,18);
+    ctx.font='500 9px Inter,Arial';ctx.fillStyle='#94a3b8';
+    ctx.fillText('Slide cars · free the red car →',12,32);
+    /* moves badge */
+    ctx.font='700 9px Inter,Arial';ctx.fillStyle='#f59e0b';ctx.textAlign='right';
+    ctx.fillText(moves+' move'+(moves===1?'':'s'),W-10,25);
+    ctx.textAlign='left';
+
+    /* grid */
+    ctx.fillStyle='#1e293b';ctx.fillRect(GX,GY,COLS*CELL,ROWS*CELL);
+    ctx.strokeStyle='rgba(148,163,184,0.08)';ctx.lineWidth=1;
+    for(var c=0;c<=COLS;c++){ctx.beginPath();ctx.moveTo(GX+c*CELL,GY);ctx.lineTo(GX+c*CELL,GY+ROWS*CELL);ctx.stroke();}
+    for(var r=0;r<=ROWS;r++){ctx.beginPath();ctx.moveTo(GX,GY+r*CELL);ctx.lineTo(GX+COLS*CELL,GY+r*CELL);ctx.stroke();}
+
+    /* exit lane */
+    var exitY=GY+2*CELL;
+    ctx.fillStyle='rgba(34,197,94,0.18)';ctx.fillRect(GX+COLS*CELL,exitY,10,CELL);
+    ctx.fillStyle='#22c55e';
+    ctx.beginPath();ctx.moveTo(GX+COLS*CELL+3,exitY+CELL/2-5);ctx.lineTo(GX+COLS*CELL+10,exitY+CELL/2);ctx.lineTo(GX+COLS*CELL+3,exitY+CELL/2+5);ctx.fill();
+
+    /* cars */
+    cars.forEach(function(car){
+      var px=GX+car.col*CELL+2,py=GY+car.row*CELL+2;
+      var pw=car.dir==='h'?car.size*CELL-4:CELL-4;
+      var ph=car.dir==='h'?CELL-4:car.size*CELL-4;
+      ctx.shadowColor=car.color;ctx.shadowBlur=car.isTarget?10:4;
+      rrect(px,py,pw,ph,5);ctx.fillStyle=car.color;ctx.fill();
+      ctx.shadowBlur=0;
+      /* windshield glare */
+      rrect(px+3,py+3,pw-8,Math.min(ph*0.3,7),3);
+      ctx.fillStyle='rgba(255,255,255,0.25)';ctx.fill();
+      if(car.isTarget){
+        ctx.font='700 11px Arial';ctx.fillStyle='#fff';ctx.textAlign='center';
+        ctx.fillText('→',px+pw/2,py+ph/2+4);
+        ctx.textAlign='left';
+      }
     });
-    track('time_on_page', { seconds: Math.round((Date.now() - pageStart) / 1000) });
-    Object.keys(dwell).forEach(function(id){
-      track('section_dwell', { section: id, seconds: Math.round(dwell[id] / 1000) });
+
+    /* ── bottom panel ── */
+    var P=GRID_BOTTOM+8;
+    /* divider */
+    ctx.fillStyle='rgba(148,163,184,0.1)';ctx.fillRect(12,P,W-24,1);
+    P+=12;
+
+    /* progress dots */
+    ctx.font='700 8.5px Inter,Arial';ctx.fillStyle='#64748b';ctx.textAlign='left';
+    ctx.fillText('MOVES',12,P+9);
+    for(var d=0;d<6;d++){
+      ctx.beginPath();ctx.arc(68+d*16,P+5,5,0,6.28);
+      ctx.fillStyle=d<moves?'#f59e0b':'rgba(148,163,184,0.2)';ctx.fill();
+    }
+    P+=26;
+
+    /* instruction box */
+    rrect(12,P,W-24,48,10);ctx.fillStyle='rgba(239,68,68,0.08)';ctx.fill();
+    ctx.strokeStyle='rgba(239,68,68,0.25)';ctx.lineWidth=1;
+    rrect(12,P,W-24,48,10);ctx.stroke();
+    ctx.font='700 10px Inter,Arial';ctx.fillStyle='#fca5a5';ctx.textAlign='center';
+    ctx.fillText('Slide the blue car down,',W/2,P+17);
+    ctx.fillText('then slide red car right →',W/2,P+31);
+    ctx.font='500 8.5px Inter,Arial';ctx.fillStyle='#64748b';
+    ctx.fillText('2 moves to escape!',W/2,P+44);
+    P+=60;
+
+    /* exit arrow graphic */
+    ctx.strokeStyle='rgba(34,197,94,0.4)';ctx.lineWidth=2;ctx.setLineDash([4,3]);
+    ctx.beginPath();ctx.moveTo(12,P+10);ctx.lineTo(W-28,P+10);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='#22c55e';
+    ctx.beginPath();ctx.moveTo(W-24,P+5);ctx.lineTo(W-12,P+10);ctx.lineTo(W-24,P+15);ctx.fill();
+    ctx.font='600 8.5px Inter,Arial';ctx.fillStyle='#22c55e';ctx.textAlign='left';
+    ctx.fillText('EXIT',12,P+8);
+    P+=28;
+
+    /* powered by */
+    ctx.font='500 8px Inter,Arial';ctx.fillStyle='rgba(148,163,184,0.35)';ctx.textAlign='center';
+    ctx.fillText('Powered by Unity Ads',W/2,H-10);
+    ctx.textAlign='left';
+
+    /* win overlay */
+    if(state==='win'){
+      ctx.fillStyle='rgba(10,15,30,0.9)';ctx.fillRect(0,0,W,H);
+      ctx.textAlign='center';
+      ctx.font='700 10px Inter,Arial';ctx.fillStyle='#94a3b8';ctx.fillText('PARKING JAM',W/2,148);
+      ctx.font='900 26px Arial';ctx.fillStyle='#fff';ctx.fillText('Escaped! 🚗',W/2,182);
+      ctx.font='600 10px Inter,Arial';ctx.fillStyle='#94a3b8';ctx.fillText('Solved in '+moves+' move'+(moves===1?'':'s'),W/2,202);
+      ctx.shadowColor='#ef4444';ctx.shadowBlur=18;
+      rrect(W/2-78,220,156,44,22);ctx.fillStyle='#ef4444';ctx.fill();ctx.shadowBlur=0;
+      ctx.font='800 13px Arial';ctx.fillStyle='#fff';ctx.fillText('Download Now →',W/2,248);
+      ctx.font='500 8px Inter,Arial';ctx.fillStyle='rgba(255,255,255,0.25)';
+      ctx.fillText('Powered by Unity Ads',W/2,H-16);
+      ctx.textAlign='left';
+    }
+  }
+
+  function evtPos(e){
+    var rect=canvas.getBoundingClientRect();
+    var scX=W/rect.width,scY=H/rect.height;
+    var src=e.touches?e.touches[0]:(e.changedTouches?e.changedTouches[0]:e);
+    return{x:(src.clientX-rect.left)*scX,y:(src.clientY-rect.top)*scY};
+  }
+
+  function carAt(p){
+    for(var i=cars.length-1;i>=0;i--){
+      var c=cars[i];
+      var px=GX+c.col*CELL,py=GY+c.row*CELL;
+      var pw=c.dir==='h'?c.size*CELL:CELL,ph=c.dir==='h'?CELL:c.size*CELL;
+      if(p.x>=px&&p.x<px+pw&&p.y>=py&&p.y<py+ph)return c;
+    }
+    return null;
+  }
+
+  canvas.addEventListener('mousedown',function(e){
+    if(state==='win'){reset();state='playing';draw();return;}
+    var p=evtPos(e);drag=carAt(p);
+    if(drag){dmx=p.x;dmy=p.y;dsc=drag.col;dsr=drag.row;dragMoved=false;canvas.style.cursor='grabbing';}
+  });
+  canvas.addEventListener('mousemove',function(e){
+    if(!drag)return;
+    var p=evtPos(e);
+    var dx=p.x-dmx,dy=p.y-dmy;
+    var prevCol=drag.col,prevRow=drag.row;
+    if(drag.dir==='h'){
+      var nc=dsc+Math.round(dx/CELL);
+      if(drag.isTarget&&nc>=COLS-drag.size+1){
+        if(!dragMoved){moves++;dragMoved=true;}
+        state='win';drag=null;canvas.style.cursor='grab';draw();return;
+      }
+      drag.col=clampH(drag,nc);
+      if(drag.col!==prevCol&&!dragMoved){moves++;dragMoved=true;}
+    } else {
+      drag.row=clampV(drag,dsr+Math.round(dy/CELL));
+      if(drag.row!==prevRow&&!dragMoved){moves++;dragMoved=true;}
+    }
+    draw();
+  });
+  canvas.addEventListener('mouseup',function(){drag=null;canvas.style.cursor='grab';});
+  canvas.addEventListener('mouseleave',function(){drag=null;canvas.style.cursor='grab';});
+  canvas.addEventListener('touchstart',function(e){
+    e.preventDefault();
+    if(state==='win'){reset();state='playing';draw();return;}
+    var p=evtPos(e);drag=carAt(p);
+    if(drag){dmx=p.x;dmy=p.y;dsc=drag.col;dsr=drag.row;dragMoved=false;}
+  },{passive:false});
+  canvas.addEventListener('touchmove',function(e){
+    e.preventDefault();
+    if(!drag)return;
+    var p=evtPos(e);
+    var dx=p.x-dmx,dy=p.y-dmy;
+    var prevCol=drag.col,prevRow=drag.row;
+    if(drag.dir==='h'){
+      var nc=dsc+Math.round(dx/CELL);
+      if(drag.isTarget&&nc>=COLS-drag.size+1){
+        if(!dragMoved){moves++;dragMoved=true;}
+        state='win';drag=null;draw();return;
+      }
+      drag.col=clampH(drag,nc);
+      if(drag.col!==prevCol&&!dragMoved){moves++;dragMoved=true;}
+    } else {
+      drag.row=clampV(drag,dsr+Math.round(dy/CELL));
+      if(drag.row!==prevRow&&!dragMoved){moves++;dragMoved=true;}
+    }
+    draw();
+  },{passive:false});
+  canvas.addEventListener('touchend',function(){drag=null;});
+
+  draw();
+})();
+</script>
+
+<!-- ─── GEM RUSH INTERACTIVE PLAYABLE ─── -->
+<script>
+(function(){
+  var canvas = document.getElementById('gem-canvas');
+  if (!canvas || !canvas.getContext) return;
+  var ctx = canvas.getContext('2d');
+  var CW = 210, CH = 410;
+  var DPR = Math.ceil(window.devicePixelRatio || 1);
+  canvas.width = CW * DPR; canvas.height = CH * DPR;
+  ctx.scale(DPR, DPR);
+  var state = 'idle';
+  var score = 0, MAX = 5;
+  var basketX = CW / 2;
+  var gems = [], sparks = [];
+  var lastSpawn = 0, raf, hovered = false;
+  var COLORS = ['#7c3aed','#f72f9e','#059669','#f59e0b','#0ea5e9','#a855f7'];
+
+  function rnd(a,b){ return a + Math.random()*(b-a); }
+
+  var stars = [];
+  for(var s=0;s<45;s++) stars.push({x:rnd(0,CW),y:rnd(0,CH),r:rnd(0.5,1.8),a:rnd(0.25,0.85)});
+
+  function spawnGem(){
+    gems.push({x:rnd(18,CW-18),y:-14,r:rnd(9,13),vy:rnd(1.9,3.3),color:COLORS[Math.floor(Math.random()*COLORS.length)],ang:rnd(0,6.28),spin:rnd(-0.05,0.05)});
+  }
+
+  function roundRect(x,y,w,h,r){
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);
+    ctx.lineTo(x+w-r,y);
+    ctx.arcTo(x+w,y,x+w,y+r,r);
+    ctx.lineTo(x+w,y+h-r);
+    ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
+    ctx.lineTo(x+r,y+h);
+    ctx.arcTo(x,y+h,x,y+h-r,r);
+    ctx.lineTo(x,y+r);
+    ctx.arcTo(x,y,x+r,y,r);
+    ctx.closePath();
+  }
+
+  function drawGem(g){
+    var r=g.r;
+    ctx.save();
+    ctx.translate(g.x,g.y);
+    ctx.rotate(g.ang);
+    ctx.beginPath();
+    ctx.moveTo(0,-r*1.2);
+    ctx.lineTo(r*0.85,-r*0.1);
+    ctx.lineTo(r*0.5,r*0.85);
+    ctx.lineTo(0,r*1.0);
+    ctx.lineTo(-r*0.5,r*0.85);
+    ctx.lineTo(-r*0.85,-r*0.1);
+    ctx.closePath();
+    ctx.fillStyle=g.color; ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(0,-r*0.75);
+    ctx.lineTo(r*0.42,-r*0.1);
+    ctx.lineTo(0,r*0.28);
+    ctx.lineTo(-r*0.42,-r*0.1);
+    ctx.closePath();
+    ctx.fillStyle='rgba(255,255,255,0.18)'; ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(-r*0.28,-r*0.88);
+    ctx.lineTo(0,-r*0.5);
+    ctx.lineTo(-r*0.52,-r*0.28);
+    ctx.closePath();
+    ctx.fillStyle='rgba(255,255,255,0.48)'; ctx.fill();
+    ctx.restore();
+  }
+
+  function addSparks(x,y,color){
+    for(var i=0;i<10;i++){
+      var a=rnd(0,6.28);
+      sparks.push({x:x,y:y,vx:Math.cos(a)*rnd(1.5,3.2),vy:Math.sin(a)*rnd(1.5,3.2),r:rnd(2,4),color:color,life:1,decay:rnd(0.04,0.08)});
+    }
+  }
+
+  function frame(ts){
+    raf=requestAnimationFrame(frame);
+    ctx.fillStyle='#0d0520'; ctx.fillRect(0,0,CW,CH);
+    for(var s=0;s<stars.length;s++){
+      ctx.beginPath(); ctx.arc(stars[s].x,stars[s].y,stars[s].r,0,6.28);
+      ctx.fillStyle='rgba(255,255,255,'+stars[s].a+')'; ctx.fill();
+    }
+
+    if(state==='idle'){
+      var pulse=0.65+0.35*Math.sin(ts*0.003);
+      ctx.globalAlpha=pulse;
+      ctx.fillStyle='#a78bfa'; ctx.font='800 15px Arial'; ctx.textAlign='center';
+      ctx.fillText('GEM RUSH',CW/2,CH/2-50);
+      ctx.fillStyle='#7c3aed'; ctx.font='900 52px Arial';
+      ctx.fillText('◆',CW/2,CH/2+4);
+      ctx.fillStyle='rgba(167,139,250,0.85)'; ctx.font='600 12px Arial';
+      ctx.fillText('Move cursor here to play',CW/2,CH/2+38);
+      ctx.fillStyle='rgba(124,58,237,0.5)'; ctx.font='500 10px Arial';
+      ctx.fillText('A Unity Ads Playable',CW/2,CH-28);
+      ctx.globalAlpha=1; ctx.textAlign='left';
+      return;
+    }
+
+    if(state==='win'){
+      ctx.fillStyle='rgba(13,5,32,0.88)'; ctx.fillRect(0,0,CW,CH);
+      ctx.textAlign='center';
+      ctx.fillStyle='#c4b5fd'; ctx.font='700 11px Arial';
+      ctx.fillText('GEM RUSH',CW/2,90);
+      ctx.fillStyle='#fff'; ctx.font='900 28px Arial';
+      ctx.fillText('★ You Win!',CW/2,140);
+      ctx.fillStyle='#a78bfa'; ctx.font='600 13px Arial';
+      ctx.fillText(MAX+'/'+MAX+' gems caught!',CW/2,172);
+      ctx.shadowColor='#7c3aed'; ctx.shadowBlur=18;
+      roundRect(CW/2-82,200,164,46,23);
+      ctx.fillStyle='#7c3aed'; ctx.fill();
+      ctx.shadowBlur=0;
+      ctx.fillStyle='#fff'; ctx.font='800 13px Arial';
+      ctx.fillText('Download Now →',CW/2,228);
+      ctx.fillStyle='rgba(255,255,255,0.28)'; ctx.font='500 9px Arial';
+      ctx.fillText('Powered by Unity Ads',CW/2,CH-22);
+      ctx.textAlign='left';
+      return;
+    }
+
+    // playing ─ top bar
+    ctx.fillStyle='rgba(0,0,0,0.55)'; ctx.fillRect(0,0,CW,40);
+    ctx.fillStyle='#d4bfff'; ctx.font='700 11px Arial';
+    ctx.fillText('GEM RUSH',12,25);
+    for(var d=0;d<MAX;d++){
+      ctx.beginPath(); ctx.arc(CW-16-d*21,20,7,0,6.28);
+      if(d<score){ ctx.fillStyle='#7c3aed'; ctx.shadowColor='#7c3aed'; ctx.shadowBlur=7; }
+      else { ctx.fillStyle='rgba(255,255,255,0.12)'; ctx.shadowBlur=0; }
+      ctx.fill(); ctx.shadowBlur=0;
+    }
+
+    // spawn
+    if(!lastSpawn||ts-lastSpawn>850){ spawnGem(); lastSpawn=ts; }
+
+    var BW=62, BY=CH-52;
+    for(var gi=gems.length-1;gi>=0;gi--){
+      var g=gems[gi];
+      g.y+=g.vy; g.ang+=g.spin;
+      if(g.y+g.r>BY&&g.y-g.r<BY+16&&g.x>basketX-BW/2&&g.x<basketX+BW/2){
+        addSparks(g.x,BY,g.color); gems.splice(gi,1); score++;
+        if(score>=MAX){
+          state='win'; gems=[];
+          setTimeout(function(){ state=hovered?'playing':'idle'; score=0; lastSpawn=0; },3000);
+        }
+        continue;
+      }
+      if(g.y>CH+20){ gems.splice(gi,1); continue; }
+      drawGem(g);
+    }
+
+    // sparkles
+    for(var si=sparks.length-1;si>=0;si--){
+      var p=sparks[si];
+      p.x+=p.vx; p.y+=p.vy; p.vy+=0.12; p.life-=p.decay;
+      if(p.life<=0){ sparks.splice(si,1); continue; }
+      ctx.globalAlpha=p.life;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r*p.life,0,6.28);
+      ctx.fillStyle=p.color; ctx.fill();
+      ctx.globalAlpha=1;
+    }
+
+    // basket
+    ctx.shadowColor='#7c3aed'; ctx.shadowBlur=12;
+    roundRect(basketX-BW/2,BY,BW,15,7);
+    ctx.fillStyle='rgba(124,58,237,0.88)'; ctx.fill();
+    ctx.shadowBlur=0;
+    roundRect(basketX-BW/2+7,BY+4,BW-18,5,2);
+    ctx.fillStyle='rgba(255,255,255,0.28)'; ctx.fill();
+  }
+
+  var frame_el = document.getElementById('playable-frame');
+  if(frame_el){
+    frame_el.addEventListener('mousemove',function(e){
+      var rect=canvas.getBoundingClientRect();
+      var scale=CW/rect.width;
+      basketX=Math.max(38,Math.min(CW-38,(e.clientX-rect.left)*scale));
+      if(state==='idle'){ state='playing'; }
+      hovered=true;
+    });
+    frame_el.addEventListener('mouseenter',function(){ hovered=true; });
+    frame_el.addEventListener('mouseleave',function(){
+      hovered=false;
+      if(state==='playing'){ state='idle'; gems=[]; score=0; lastSpawn=0; }
     });
   }
-  document.addEventListener('visibilitychange', function(){ if (document.visibilityState === 'hidden') flushExit(); });
-  window.addEventListener('pagehide', flushExit);
+  canvas.addEventListener('touchmove',function(e){
+    e.preventDefault();
+    var rect=canvas.getBoundingClientRect();
+    var scale=CW/rect.width;
+    basketX=Math.max(38,Math.min(CW-38,(e.touches[0].clientX-rect.left)*scale));
+    if(state==='idle') state='playing';
+    hovered=true;
+  },{passive:false});
+  canvas.addEventListener('touchend',function(){ hovered=false; });
+
+  raf=requestAnimationFrame(frame);
+})();
+</script>
+
+<!-- ─── ANALYTICS EVENT TRACKING ─── -->
+<script>
+(function(){
+  function track(name, params){
+    if (typeof window.gtag === 'function') { window.gtag('event', name, params || {}); }
+  }
+
+  // Primary CTA: "Talk to your Unity team" (mailto) — the conversation goal
+  document.querySelectorAll('a[href^="mailto:"]').forEach(function(a){
+    a.addEventListener('click', function(){ track('cta_talk_to_team'); });
+  });
+
+  // "At a glance" index clicks — which topics pull interest
+  document.querySelectorAll('.glance-row').forEach(function(a){
+    a.addEventListener('click', function(){ track('glance_click', { section: a.getAttribute('href') }); });
+  });
+
+  // Side-rail chapter clicks
+  document.querySelectorAll('.nav-item[data-section]').forEach(function(a){
+    a.addEventListener('click', function(){ track('nav_click', { section: a.getAttribute('data-section') }); });
+  });
+
+  // Manage preferences / Unsubscribe
+  var pref = document.querySelector('a[href*="create.unity.com"]');
+  if (pref) pref.addEventListener('click', function(){ track('manage_preferences_click'); });
+  var unsub = document.querySelector('a[href="unsubscribe.html"]');
+  if (unsub) unsub.addEventListener('click', function(){ track('unsubscribe_click'); });
+
+  // Outbound case-study / reference links
+  document.querySelectorAll('a[href^="http"]').forEach(function(a){
+    if (/unity\.com\/resources|cloud\.google\.com|iab/i.test(a.href)) {
+      a.addEventListener('click', function(){ track('outbound_click', { url: a.href }); });
+    }
+  });
+
+  // Scroll-depth milestones — engagement / how far they read
+  var marks = [25, 50, 75, 100], hit = {};
+  function onScroll(){
+    var d = document.documentElement;
+    var max = d.scrollHeight - d.clientHeight;
+    if (max <= 0) return;
+    var pct = (d.scrollTop / max) * 100;
+    marks.forEach(function(m){ if (!hit[m] && pct >= m) { hit[m] = 1; track('scroll_depth', { percent: m }); } });
+  }
+  document.addEventListener('scroll', onScroll, { passive: true });
 })();
 </script>
 </body>
