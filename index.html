@@ -8,11 +8,21 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=UnifrakturCook:wght@700&family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
 
-  <!-- ─── ANALYTICS (GA4) ───────────────────────────────────────────────
-       Paste your GA4 Measurement ID (looks like G-XXXXXXXXXX) below.
-       Get one at analytics.google.com → Admin → Data Streams → Web.
-       Until it's filled in, no tracking runs. ──────────────────────────── -->
-  <script>window.NEWSLETTER_GA_ID = "";</script>
+  <!-- ─── CONFIG: ANALYTICS + SUBSCRIBE ──────────────────────────────────
+       Each piece stays off until its value is set (safe to ship).
+       NEWSLETTER_GA_ID         GA4 Measurement ID ("G-XXXXXXXXXX") — optional
+       NEWSLETTER_CLARITY_ID    Microsoft Clarity Project ID — optional
+       NEWSLETTER_SUBSCRIBE_URL Optional Google Form URL; blank = built-in popup
+       NEWSLETTER_LOG_ENDPOINT  Apps Script web-app URL → logs to the Google Sheet
+       ──────────────────────────────────────────────────────────────────── -->
+  <script>
+    window.NEWSLETTER_GA_ID         = "";
+    window.NEWSLETTER_CLARITY_ID    = "";
+    window.NEWSLETTER_SUBSCRIBE_URL = "";
+    window.NEWSLETTER_LOG_ENDPOINT  = "https://script.google.com/macros/s/AKfycbyf3CRpnZVkn31qjDyF-rdHmgvtvFw4bhdFjHKld6N1esAE8BUVVqhKjvzfuG9ZWKiFTg/exec";
+  </script>
+
+  <!-- GA4 loader -->
   <script>
     (function(){
       var id = window.NEWSLETTER_GA_ID;
@@ -25,6 +35,16 @@
       gtag('js', new Date());
       gtag('config', id);
     })();
+  </script>
+
+  <!-- Microsoft Clarity loader (heatmaps + session recordings) -->
+  <script>
+    (function(c,l,a,r,i,t,y){
+      if (!window.NEWSLETTER_CLARITY_ID) return;
+      c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+      t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+      y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window,document,"clarity","script",window.NEWSLETTER_CLARITY_ID);
   </script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -3015,32 +3035,104 @@
 <!-- ─── ANALYTICS EVENT TRACKING ─── -->
 <script>
 (function(){
+  // Per-browser visitor id + per-visit session id
+  function uid(k, store){
+    try { var v = store.getItem(k); if (!v) { v = (Date.now().toString(36) + Math.random().toString(36).slice(2, 8)); store.setItem(k, v); } return v; } catch(e){ return 'anon'; }
+  }
+  var visitorId = uid('nl_visitor', window.localStorage);
+  var sessionId = uid('nl_session', window.sessionStorage);
+
+  var ua = navigator.userAgent || '';
+  function parseBrowser(u){ if(/edg/i.test(u))return'Edge'; if(/opr|opera/i.test(u))return'Opera'; if(/chrome|crios/i.test(u))return'Chrome'; if(/firefox|fxios/i.test(u))return'Firefox'; if(/safari/i.test(u))return'Safari'; return'Other'; }
+  function parseOS(u){ if(/windows/i.test(u))return'Windows'; if(/iphone|ipad|ipod/i.test(u))return'iOS'; if(/android/i.test(u))return'Android'; if(/mac os/i.test(u))return'macOS'; if(/linux/i.test(u))return'Linux'; return'Other'; }
+
+  // Campaign attribution from the landing URL, kept for the session
+  var utm = (function(){
+    var keys = ['utm_source','utm_medium','utm_campaign','utm_term','utm_content','gclid','fbclid'];
+    var out = {};
+    try {
+      var stored = JSON.parse(sessionStorage.getItem('nl_utm') || '{}');
+      var qs = new URLSearchParams(location.search);
+      var sawNew = false;
+      keys.forEach(function(k){ var v = qs.get(k); if (v) { out[k] = v; sawNew = true; } else if (stored[k]) { out[k] = stored[k]; } });
+      if (sawNew) { sessionStorage.setItem('nl_utm', JSON.stringify(out)); } else { out = stored; }
+    } catch(e){}
+    return out;
+  })();
+
+  var ctx = Object.assign({
+    lang: navigator.language || '',
+    tz: (function(){ try { return Intl.DateTimeFormat().resolvedOptions().timeZone; } catch(e){ return ''; } })(),
+    os: parseOS(ua), browser: parseBrowser(ua),
+    device: /mobile|android|iphone|ipad|ipod/i.test(ua) ? 'mobile' : 'desktop'
+  }, utm);
+  var geo = {};
+
   function track(name, params){
-    if (typeof window.gtag === 'function') { window.gtag('event', name, params || {}); }
+    params = params || {};
+    if (typeof window.gtag === 'function') { window.gtag('event', name, params); }
+    var ep = window.NEWSLETTER_LOG_ENDPOINT;
+    if (ep) {
+      var payload = Object.assign({
+        event: name, visitor: visitorId, session: sessionId,
+        ts: new Date().toISOString(), path: location.pathname + location.hash,
+        ref: document.referrer || '', w: window.innerWidth, h: window.innerHeight
+      }, ctx, geo, params);
+      try {
+        var body = JSON.stringify(payload);
+        if (navigator.sendBeacon) { navigator.sendBeacon(ep, body); }
+        else { fetch(ep, { method: 'POST', mode: 'no-cors', keepalive: true, body: body }); }
+      } catch(e){}
+    }
   }
 
-  // Primary CTA: "Talk to your Unity team" (→ unity.com/contact-us) — the conversation goal
-  document.querySelectorAll('a.cta-btn').forEach(function(a){
-    a.addEventListener('click', function(){ track('cta_talk_to_team'); });
-  });
+  track('page_view');
 
-  // "At a glance" index clicks — which topics pull interest
+  // Engagement: once per session at 15s, 50% scroll, or first click
+  var engagedFired = false;
+  function markEngaged(reason){
+    if (engagedFired) return;
+    try { if (sessionStorage.getItem('nl_engaged')) { engagedFired = true; return; } } catch(e){}
+    engagedFired = true;
+    try { sessionStorage.setItem('nl_engaged', '1'); } catch(e){}
+    track('engaged', { reason: reason });
+  }
+  setTimeout(function(){ markEngaged('time_15s'); }, 15000);
+
+  // Approximate location from IP (no key); attaches to later events + a visitor_info row
+  try {
+    fetch('https://ipwho.is/?fields=success,ip,country,country_code,region,city,connection')
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if (d && d.success !== false) {
+          geo = { ip: d.ip || '', country: d.country || '', country_code: d.country_code || '', region: d.region || '', city: d.city || '', isp: (d.connection && (d.connection.isp || d.connection.org)) || '' };
+          track('visitor_info');
+        }
+      }).catch(function(){});
+  } catch(e){}
+
+  document.querySelectorAll('a.cta-btn').forEach(function(a){
+    a.addEventListener('click', function(){ markEngaged('cta_click'); track('cta_talk_to_team'); });
+  });
   document.querySelectorAll('.glance-row').forEach(function(a){
     a.addEventListener('click', function(){ track('glance_click', { section: a.getAttribute('href') }); });
   });
-
-  // Side-rail chapter clicks
   document.querySelectorAll('.nav-item[data-section]').forEach(function(a){
     a.addEventListener('click', function(){ track('nav_click', { section: a.getAttribute('data-section') }); });
   });
 
-  // Subscribe (footer): open built-in popup
+  // Subscribe (footer): external Form if configured, else built-in popup → Sheet
   var sub = document.getElementById('subscribe-link');
   var overlay = document.getElementById('nlsub-overlay');
   function openSub(){ if (overlay) { overlay.classList.add('open'); overlay.setAttribute('aria-hidden','false'); var i = document.getElementById('nlsub-email'); if (i) i.focus(); } }
   function closeSub(){ if (overlay) { overlay.classList.remove('open'); overlay.setAttribute('aria-hidden','true'); } }
   if (sub) {
-    sub.addEventListener('click', function(e){ e.preventDefault(); track('subscribe_open'); openSub(); });
+    var subUrl = window.NEWSLETTER_SUBSCRIBE_URL;
+    if (subUrl) { sub.setAttribute('href', subUrl); sub.setAttribute('target', '_blank'); }
+    sub.addEventListener('click', function(e){
+      if (window.NEWSLETTER_SUBSCRIBE_URL) { track('subscribe_click'); return; }
+      e.preventDefault(); track('subscribe_open'); openSub();
+    });
   }
   if (overlay) {
     var closeBtn = document.getElementById('nlsub-close');
@@ -3062,23 +3154,47 @@
     });
   }
 
-  // Outbound case-study / reference links
   document.querySelectorAll('a[href^="http"]').forEach(function(a){
     if (/unity\.com\/resources|cloud\.google\.com|iab/i.test(a.href)) {
       a.addEventListener('click', function(){ track('outbound_click', { url: a.href }); });
     }
   });
 
-  // Scroll-depth milestones — engagement / how far they read
+  // Scroll-depth milestones (session depth)
   var marks = [25, 50, 75, 100], hit = {};
   function onScroll(){
     var d = document.documentElement;
     var max = d.scrollHeight - d.clientHeight;
     if (max <= 0) return;
     var pct = (d.scrollTop / max) * 100;
-    marks.forEach(function(m){ if (!hit[m] && pct >= m) { hit[m] = 1; track('scroll_depth', { percent: m }); } });
+    marks.forEach(function(m){ if (!hit[m] && pct >= m) { hit[m] = 1; track('scroll_depth', { percent: m }); if (m >= 50) markEngaged('scroll_50'); } });
   }
   document.addEventListener('scroll', onScroll, { passive: true });
+
+  // Section views + dwell — where people go and pause
+  var seen = {}, enterAt = {}, dwell = {};
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        var id = en.target.id;
+        if (!id) return;
+        if (en.isIntersecting) { enterAt[id] = Date.now(); if (!seen[id]) { seen[id] = 1; track('section_view', { section: id }); } }
+        else if (enterAt[id]) { dwell[id] = (dwell[id] || 0) + (Date.now() - enterAt[id]); enterAt[id] = 0; }
+      });
+    }, { threshold: 0.5 });
+    document.querySelectorAll('section[id]').forEach(function(s){ io.observe(s); });
+  }
+
+  // Time on page + per-section dwell — sent on leave
+  var pageStart = Date.now(), sentExit = false;
+  function flushExit(){
+    if (sentExit) return; sentExit = true;
+    Object.keys(enterAt).forEach(function(id){ if (enterAt[id]) { dwell[id] = (dwell[id] || 0) + (Date.now() - enterAt[id]); } });
+    track('time_on_page', { seconds: Math.round((Date.now() - pageStart) / 1000) });
+    Object.keys(dwell).forEach(function(id){ track('section_dwell', { section: id, seconds: Math.round(dwell[id] / 1000) }); });
+  }
+  document.addEventListener('visibilitychange', function(){ if (document.visibilityState === 'hidden') flushExit(); });
+  window.addEventListener('pagehide', flushExit);
 })();
 </script>
 <!-- ─── JEWEL COLORING INTERACTIVE ─── -->
@@ -3676,73 +3792,5 @@
 </script>
 
 <!-- ─── ANALYTICS EVENT TRACKING ─── -->
-<script>
-(function(){
-  function track(name, params){
-    if (typeof window.gtag === 'function') { window.gtag('event', name, params || {}); }
-  }
-
-  // Primary CTA: "Talk to your Unity team" (→ unity.com/contact-us) — the conversation goal
-  document.querySelectorAll('a.cta-btn').forEach(function(a){
-    a.addEventListener('click', function(){ track('cta_talk_to_team'); });
-  });
-
-  // "At a glance" index clicks — which topics pull interest
-  document.querySelectorAll('.glance-row').forEach(function(a){
-    a.addEventListener('click', function(){ track('glance_click', { section: a.getAttribute('href') }); });
-  });
-
-  // Side-rail chapter clicks
-  document.querySelectorAll('.nav-item[data-section]').forEach(function(a){
-    a.addEventListener('click', function(){ track('nav_click', { section: a.getAttribute('data-section') }); });
-  });
-
-  // Subscribe (footer): open built-in popup
-  var sub = document.getElementById('subscribe-link');
-  var overlay = document.getElementById('nlsub-overlay');
-  function openSub(){ if (overlay) { overlay.classList.add('open'); overlay.setAttribute('aria-hidden','false'); var i = document.getElementById('nlsub-email'); if (i) i.focus(); } }
-  function closeSub(){ if (overlay) { overlay.classList.remove('open'); overlay.setAttribute('aria-hidden','true'); } }
-  if (sub) {
-    sub.addEventListener('click', function(e){ e.preventDefault(); track('subscribe_open'); openSub(); });
-  }
-  if (overlay) {
-    var closeBtn = document.getElementById('nlsub-close');
-    if (closeBtn) closeBtn.addEventListener('click', closeSub);
-    overlay.addEventListener('click', function(e){ if (e.target === overlay) closeSub(); });
-    document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeSub(); });
-    var submit = document.getElementById('nlsub-submit');
-    if (submit) submit.addEventListener('click', function(){
-      var email = (document.getElementById('nlsub-email').value || '').trim();
-      var name = (document.getElementById('nlsub-name').value || '').trim();
-      var studio = (document.getElementById('nlsub-studio').value || '').trim();
-      var err = document.getElementById('nlsub-err');
-      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { err.textContent = 'Please enter a valid email.'; return; }
-      err.textContent = '';
-      track('subscribe', { url: email, name: name, studio: studio });
-      document.getElementById('nlsub-form').style.display = 'none';
-      document.getElementById('nlsub-done').style.display = 'block';
-      setTimeout(closeSub, 2200);
-    });
-  }
-
-  // Outbound case-study / reference links
-  document.querySelectorAll('a[href^="http"]').forEach(function(a){
-    if (/unity\.com\/resources|cloud\.google\.com|iab/i.test(a.href)) {
-      a.addEventListener('click', function(){ track('outbound_click', { url: a.href }); });
-    }
-  });
-
-  // Scroll-depth milestones — engagement / how far they read
-  var marks = [25, 50, 75, 100], hit = {};
-  function onScroll(){
-    var d = document.documentElement;
-    var max = d.scrollHeight - d.clientHeight;
-    if (max <= 0) return;
-    var pct = (d.scrollTop / max) * 100;
-    marks.forEach(function(m){ if (!hit[m] && pct >= m) { hit[m] = 1; track('scroll_depth', { percent: m }); } });
-  }
-  document.addEventListener('scroll', onScroll, { passive: true });
-})();
-</script>
 </body>
 </html>
