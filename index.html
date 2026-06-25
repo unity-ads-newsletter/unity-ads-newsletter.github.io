@@ -8,11 +8,32 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=UnifrakturCook:wght@700&family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
 
-  <!-- ─── ANALYTICS (GA4) ───────────────────────────────────────────────
-       Paste your GA4 Measurement ID (looks like G-XXXXXXXXXX) below.
-       Get one at analytics.google.com → Admin → Data Streams → Web.
-       Until it's filled in, no tracking runs. ──────────────────────────── -->
-  <script>window.NEWSLETTER_GA_ID = "";</script>
+  <!-- ─── CONFIG: ANALYTICS + SUBSCRIBE ──────────────────────────────────
+       Fill in the three values below. Until each is filled, that piece
+       stays off (no tracking runs, Subscribe link is inert) — safe to ship.
+
+       NEWSLETTER_GA_ID        GA4 Measurement ID, e.g. "G-XXXXXXXXXX"
+                               analytics.google.com → Admin → Data Streams → Web
+       NEWSLETTER_CLARITY_ID   Microsoft Clarity Project ID, e.g. "abc123def4"
+                               clarity.microsoft.com → New project → copy the ID
+       NEWSLETTER_SUBSCRIBE_URL  OPTIONAL. If set to a Google Form URL
+                               (https://forms.gle/...), the "Subscribe" footer
+                               link opens it. If left blank, Subscribe opens the
+                               built-in popup that writes the email straight to
+                               the Analytics Log Sheet (event "subscribe").
+       NEWSLETTER_LOG_ENDPOINT   Google Apps Script web-app URL that logs every
+                               event into the "Analytics Log" Google Sheet you
+                               own. Deploy once (see the script in the repo),
+                               paste the /exec URL here. No GA/Clarity needed.
+       ──────────────────────────────────────────────────────────────────── -->
+  <script>
+    window.NEWSLETTER_GA_ID        = "";
+    window.NEWSLETTER_CLARITY_ID   = "";
+    window.NEWSLETTER_SUBSCRIBE_URL = "";
+    window.NEWSLETTER_LOG_ENDPOINT  = "https://script.google.com/macros/s/AKfycbyf3CRpnZVkn31qjDyF-rdHmgvtvFw4bhdFjHKld6N1esAE8BUVVqhKjvzfuG9ZWKiFTg/exec";
+  </script>
+
+  <!-- GA4 loader -->
   <script>
     (function(){
       var id = window.NEWSLETTER_GA_ID;
@@ -25,6 +46,16 @@
       gtag('js', new Date());
       gtag('config', id);
     })();
+  </script>
+
+  <!-- Microsoft Clarity loader (heatmaps + session recordings) -->
+  <script>
+    (function(c,l,a,r,i,t,y){
+      if (!window.NEWSLETTER_CLARITY_ID) return;
+      c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+      t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+      y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window,document,"clarity","script",window.NEWSLETTER_CLARITY_ID);
   </script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -2751,7 +2782,7 @@
       <div class="cta-box">
         <div class="cta-title fade-up">Not sure where to start?</div>
         <div class="cta-body fade-up d2">There&rsquo;s no single right answer &mdash; the best next step depends on your monetization model and where your biggest gaps are today. Your Unity team is happy to look at your setup with you and figure out what&rsquo;s worth doing first.</div>
-        <a href="mailto:alon.halva@unity3d.com?subject=Unity%20Ads%20%E2%80%94%20let%27s%20talk%20about%20my%20setup&amp;body=Hi%20Alon%2C%0A%0AI%27d%20love%20to%20go%20over%20what%27s%20worth%20doing%20first%20for%20my%20game.%0A%0A" class="cta-btn fade-up d3">Talk to your Unity team</a>
+        <a href="https://unity.com/contact-us" target="_blank" rel="noopener" class="cta-btn fade-up d3">Talk to your Unity team</a>
       </div>
     </section>
 
@@ -2760,11 +2791,50 @@
       <p class="footer-disclaimer">Performance figures above come from internal Unity analyses and beta cohorts. They&rsquo;re real results we&rsquo;ve observed &mdash; not guaranteed outcomes. Your mileage depends on your game, traffic, and setup.</p>
       <p class="footer-sign">Thanks for reading. More soon. &mdash; The Unity Ads team</p>
       <p class="footer-links">
-        <a href="https://create.unity.com/Unity_MyPage_W_AccountID" target="_blank" rel="noopener">Manage preferences</a> &nbsp;&middot;&nbsp; <a href="unsubscribe.html">Unsubscribe</a> &nbsp;&middot;&nbsp; Unity Technologies
+        <a id="subscribe-link" href="#subscribe" rel="noopener">Subscribe</a> &nbsp;&middot;&nbsp; Unity Technologies
       </p>
     </footer>
 
   </main>
+</div>
+
+<!-- ═══ SUBSCRIBE POPUP (used when no external NEWSLETTER_SUBSCRIBE_URL is set) ═══ -->
+<style>
+  .nlsub-overlay{position:fixed;inset:0;background:rgba(13,10,20,.6);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:9999;padding:20px;}
+  .nlsub-overlay.open{display:flex;}
+  .nlsub-modal{position:relative;background:#fff;border-radius:20px;max-width:420px;width:100%;padding:38px 32px 32px;box-shadow:0 24px 64px rgba(13,10,20,.32);font-family:'Inter',sans-serif;}
+  .nlsub-close{position:absolute;top:12px;right:16px;background:none;border:none;font-size:28px;line-height:1;color:#9b9bad;cursor:pointer;}
+  .nlsub-close:hover{color:#1a1a2e;}
+  .nlsub-title{font-size:26px;font-weight:800;color:#1a1a2e;margin:0 0 6px;}
+  .nlsub-sub{font-size:15px;line-height:1.4;color:#6b6b80;margin:0 0 20px;}
+  .nlsub-input{width:100%;padding:13px 16px;font-size:15px;border:1.5px solid #e2e0ee;border-radius:12px;font-family:inherit;color:#1a1a2e;outline:none;}
+  .nlsub-input:focus{border-color:#7b2ff7;}
+  .nlsub-btn{width:100%;margin-top:12px;padding:14px;font-size:15px;font-weight:700;color:#fff;background:linear-gradient(135deg,#7b2ff7,#f72f9e);border:none;border-radius:999px;cursor:pointer;}
+  .nlsub-btn:hover{opacity:.92;}
+  .nlsub-err{color:#f72f9e;font-size:13px;margin:10px 0 0;min-height:16px;}
+  .nlsub-consent{font-size:11px;line-height:1.4;color:#9b9bad;margin:14px 0 0;}
+  .nlsub-done{text-align:center;padding:8px 0;}
+  .nlsub-check{width:56px;height:56px;margin:0 auto 14px;border-radius:50%;background:linear-gradient(135deg,#7b2ff7,#f72f9e);color:#fff;font-size:30px;display:flex;align-items:center;justify-content:center;}
+  .nlsub-done p{font-size:17px;font-weight:600;color:#1a1a2e;margin:0;}
+</style>
+<div id="nlsub-overlay" class="nlsub-overlay" aria-hidden="true">
+  <div class="nlsub-modal" role="dialog" aria-modal="true" aria-labelledby="nlsub-title">
+    <button type="button" class="nlsub-close" id="nlsub-close" aria-label="Close">&times;</button>
+    <div id="nlsub-form">
+      <h3 id="nlsub-title" class="nlsub-title">Subscribe</h3>
+      <p class="nlsub-sub">Get the next Unity Ads update in your inbox &mdash; no spam, just what&rsquo;s new.</p>
+      <input type="text" id="nlsub-name" class="nlsub-input" placeholder="Your name (optional)" autocomplete="name">
+      <input type="text" id="nlsub-studio" class="nlsub-input" placeholder="Studio / company (optional)" autocomplete="organization" style="margin-top:10px;">
+      <input type="email" id="nlsub-email" class="nlsub-input" placeholder="you@studio.com" autocomplete="email" required style="margin-top:10px;">
+      <button type="button" id="nlsub-submit" class="nlsub-btn">Subscribe</button>
+      <p class="nlsub-err" id="nlsub-err"></p>
+      <p class="nlsub-consent">By subscribing you agree we may store your details to send you Unity Ads updates. Unsubscribe anytime.</p>
+    </div>
+    <div id="nlsub-done" class="nlsub-done" style="display:none;">
+      <div class="nlsub-check">&#10003;</div>
+      <p>Thanks &mdash; you&rsquo;re on the list.</p>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -3013,12 +3083,73 @@
 <!-- ─── ANALYTICS EVENT TRACKING ─── -->
 <script>
 (function(){
+  // One visitor id per browser (counts unique visitors / "logins") + one session id
+  function uid(k, store){
+    try {
+      var v = store.getItem(k);
+      if (!v) { v = (Date.now().toString(36) + Math.random().toString(36).slice(2, 8)); store.setItem(k, v); }
+      return v;
+    } catch(e){ return 'anon'; }
+  }
+  var visitorId = uid('nl_visitor', window.localStorage);
+  var sessionId = uid('nl_session', window.sessionStorage);
+
+  // Visitor context available immediately (device / browser / language / timezone)
+  var ua = navigator.userAgent || '';
+  function parseBrowser(u){ if(/edg/i.test(u))return'Edge'; if(/opr|opera/i.test(u))return'Opera'; if(/chrome|crios/i.test(u))return'Chrome'; if(/firefox|fxios/i.test(u))return'Firefox'; if(/safari/i.test(u))return'Safari'; return'Other'; }
+  function parseOS(u){ if(/windows/i.test(u))return'Windows'; if(/iphone|ipad|ipod/i.test(u))return'iOS'; if(/android/i.test(u))return'Android'; if(/mac os/i.test(u))return'macOS'; if(/linux/i.test(u))return'Linux'; return'Other'; }
+  var ctx = {
+    lang: navigator.language || '',
+    tz: (function(){ try { return Intl.DateTimeFormat().resolvedOptions().timeZone; } catch(e){ return ''; } })(),
+    os: parseOS(ua),
+    browser: parseBrowser(ua),
+    device: /mobile|android|iphone|ipad|ipod/i.test(ua) ? 'mobile' : 'desktop'
+  };
+  var geo = {}; // populated asynchronously from IP lookup (country / region / city / isp)
+
   function track(name, params){
-    if (typeof window.gtag === 'function') { window.gtag('event', name, params || {}); }
+    params = params || {};
+    // 1) GA4 (only if a Measurement ID is configured)
+    if (typeof window.gtag === 'function') { window.gtag('event', name, params); }
+    // 2) Self-hosted log → your Google Sheet (only if an endpoint is configured)
+    var ep = window.NEWSLETTER_LOG_ENDPOINT;
+    if (ep) {
+      var payload = Object.assign({
+        event: name, visitor: visitorId, session: sessionId,
+        ts: new Date().toISOString(), path: location.pathname + location.hash,
+        ref: document.referrer || '', w: window.innerWidth, h: window.innerHeight
+      }, ctx, geo, params);
+      try {
+        var body = JSON.stringify(payload);
+        if (navigator.sendBeacon) { navigator.sendBeacon(ep, body); }
+        else { fetch(ep, { method: 'POST', mode: 'no-cors', keepalive: true, body: body }); }
+      } catch(e){}
+    }
   }
 
-  // Primary CTA: "Talk to your Unity team" (mailto) — the conversation goal
-  document.querySelectorAll('a[href^="mailto:"]').forEach(function(a){
+  // Count the visit as soon as the page loads
+  track('page_view');
+
+  // Approximate location from IP (best-effort, no key). Once resolved, it's
+  // attached to every later event, plus one visitor_info row with the full picture.
+  try {
+    fetch('https://ipwho.is/?fields=success,ip,country,country_code,region,city,connection')
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if (d && d.success !== false) {
+          geo = {
+            ip: d.ip || '', country: d.country || '', country_code: d.country_code || '',
+            region: d.region || '', city: d.city || '',
+            isp: (d.connection && (d.connection.isp || d.connection.org)) || ''
+          };
+          track('visitor_info');
+        }
+      })
+      .catch(function(){});
+  } catch(e){}
+
+  // Primary CTA: "Talk to your Unity team" (→ unity.com/contact-us) — the conversation goal
+  document.querySelectorAll('a.cta-btn').forEach(function(a){
     a.addEventListener('click', function(){ track('cta_talk_to_team'); });
   });
 
@@ -3032,11 +3163,40 @@
     a.addEventListener('click', function(){ track('nav_click', { section: a.getAttribute('data-section') }); });
   });
 
-  // Manage preferences / Unsubscribe
-  var pref = document.querySelector('a[href*="create.unity.com"]');
-  if (pref) pref.addEventListener('click', function(){ track('manage_preferences_click'); });
-  var unsub = document.querySelector('a[href="unsubscribe.html"]');
-  if (unsub) unsub.addEventListener('click', function(){ track('unsubscribe_click'); });
+  // Subscribe (footer): if an external Form URL is configured, open it;
+  // otherwise open the built-in popup that writes the email to the Sheet.
+  var sub = document.getElementById('subscribe-link');
+  var overlay = document.getElementById('nlsub-overlay');
+  function openSub(){ if (overlay) { overlay.classList.add('open'); overlay.setAttribute('aria-hidden','false'); var i = document.getElementById('nlsub-email'); if (i) i.focus(); } }
+  function closeSub(){ if (overlay) { overlay.classList.remove('open'); overlay.setAttribute('aria-hidden','true'); } }
+  if (sub) {
+    var subUrl = window.NEWSLETTER_SUBSCRIBE_URL;
+    if (subUrl) { sub.setAttribute('href', subUrl); sub.setAttribute('target', '_blank'); }
+    sub.addEventListener('click', function(e){
+      if (window.NEWSLETTER_SUBSCRIBE_URL) { track('subscribe_click'); return; }
+      e.preventDefault(); track('subscribe_open'); openSub();
+    });
+  }
+  if (overlay) {
+    var closeBtn = document.getElementById('nlsub-close');
+    if (closeBtn) closeBtn.addEventListener('click', closeSub);
+    overlay.addEventListener('click', function(e){ if (e.target === overlay) closeSub(); });
+    document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeSub(); });
+    var submit = document.getElementById('nlsub-submit');
+    if (submit) submit.addEventListener('click', function(){
+      var email = (document.getElementById('nlsub-email').value || '').trim();
+      var name = (document.getElementById('nlsub-name').value || '').trim();
+      var studio = (document.getElementById('nlsub-studio').value || '').trim();
+      var err = document.getElementById('nlsub-err');
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { err.textContent = 'Please enter a valid email.'; return; }
+      err.textContent = '';
+      // email lands in the 'url' column; name/studio get their own columns
+      track('subscribe', { url: email, name: name, studio: studio });
+      document.getElementById('nlsub-form').style.display = 'none';
+      document.getElementById('nlsub-done').style.display = 'block';
+      setTimeout(closeSub, 2200);
+    });
+  }
 
   // Outbound case-study / reference links
   document.querySelectorAll('a[href^="http"]').forEach(function(a){
@@ -3045,7 +3205,7 @@
     }
   });
 
-  // Scroll-depth milestones — engagement / how far they read
+  // Scroll-depth milestones — engagement / how far they read (session depth)
   var marks = [25, 50, 75, 100], hit = {};
   function onScroll(){
     var d = document.documentElement;
@@ -3055,6 +3215,41 @@
     marks.forEach(function(m){ if (!hit[m] && pct >= m) { hit[m] = 1; track('scroll_depth', { percent: m }); } });
   }
   document.addEventListener('scroll', onScroll, { passive: true });
+
+  // Section views + dwell time — WHERE people go and WHERE they pause
+  var seen = {}, enterAt = {}, dwell = {};
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        var id = en.target.id;
+        if (!id) return;
+        if (en.isIntersecting) {
+          enterAt[id] = Date.now();
+          if (!seen[id]) { seen[id] = 1; track('section_view', { section: id }); }
+        } else if (enterAt[id]) {
+          dwell[id] = (dwell[id] || 0) + (Date.now() - enterAt[id]);
+          enterAt[id] = 0;
+        }
+      });
+    }, { threshold: 0.5 });
+    document.querySelectorAll('section[id]').forEach(function(s){ io.observe(s); });
+  }
+
+  // Time on page + per-section dwell — HOW LONG they spent (sent once, on leave)
+  var pageStart = Date.now(), sentExit = false;
+  function flushExit(){
+    if (sentExit) return; sentExit = true;
+    // close out any section still in view
+    Object.keys(enterAt).forEach(function(id){
+      if (enterAt[id]) { dwell[id] = (dwell[id] || 0) + (Date.now() - enterAt[id]); }
+    });
+    track('time_on_page', { seconds: Math.round((Date.now() - pageStart) / 1000) });
+    Object.keys(dwell).forEach(function(id){
+      track('section_dwell', { section: id, seconds: Math.round(dwell[id] / 1000) });
+    });
+  }
+  document.addEventListener('visibilitychange', function(){ if (document.visibilityState === 'hidden') flushExit(); });
+  window.addEventListener('pagehide', flushExit);
 })();
 </script>
 </body>
